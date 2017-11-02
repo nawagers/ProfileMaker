@@ -4,22 +4,52 @@ from PIL import Image, ImageDraw, ImageFont
 import math
 import gpxpy
 import configparser
+import os.path
 
 
-ConfigFileName = "c:/Users/GuestUser/Documents/Nick/ProfileBuilder/TestData/NET.ini"
+
+ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
 
 #GPX File
 TrackFile = Config.get("InputFiles","TrackFile")
+if not os.path.isabs(TrackFile):
+    TrackFile = os.path.normpath(os.path.join(os.path.dirname(ConfigFileName),TrackFile))
+else:
+    TrackFile = os.path.normpath(TrackFile)
+if not os.path.isfile(TrackFile):
+    print("Track File does not exists: ", TrackFile)
+    raise FileNotFoundError
+
+  
 WaypointFile = Config.get("InputFiles","WaypointFile")
 if len(WaypointFile) == 0:
-    WaypointFile = Trackfile
+    WaypointFile = TrackFile
+elif not os.path.isabs(WaypointFile):
+    WaypointFile = os.path.normpath(os.path.join(os.path.dirname(ConfigFileName),WaypointFile))
+else:
+    WaypointFile = os.path.normpath(WaypointFile)
+if not os.path.isfile(WaypointFile):
+    print("Waypoint File does not exists: ", WaypointFile)
+    raise FileNotFoundError
+
+    
 TrackNumber = int(Config.get("InputFiles","TrackNumber"))
 
+
 #PlotSave
-imageFile = "c:/Users/GuestUser/Documents/Nick/ProfileBuilder/Guidebook/NET Main"
+OutputDir = Config.get("OutputFiles","OutputDir")
+if not os.path.isabs(OutputDir):
+    OutputDir = os.path.join(os.path.dirname(ConfigFileName),OutputDir)
+if not os.path.isdir(OutputDir):
+    print("Error: " + OutputDir + " is not a directory")
+    raise NotADirectoryError
+imageFile = os.path.normpath(os.path.join(OutputDir, Config.get("OutputFiles","OutputBase")))
+
 imageExt = ".png"
+
+
 
 
 
@@ -27,18 +57,18 @@ imageExt = ".png"
 
 
 #Areas in pixels
-DPI = int(1200)
-LeftBuffer = int(564)    #0.435"
-RightBuffer = int(522)   #0.435"
-TopBuffer = int(540)     #0.45"
-BottomBuffer = int(1560) #1.3"
+DPI = int(Config.get("PageSize","DPI"))
+LeftBuffer = int(float(Config.get("PlotArea","LeftBuffer"))*DPI)
+RightBuffer = int(float(Config.get("PlotArea","RightBuffer"))*DPI)
+TopBuffer = int(float(Config.get("PlotArea","TopBuffer"))*DPI)
+BottomBuffer = int(float(Config.get("PlotArea","BottomBuffer"))*DPI)
 TopWhite= int(240)       #0.2"
 BottomWhite= int(360)    #0.3"
 LeftLine = int(522)
 RightLine = int(522)
 
-VertPixels = int(4140)   #3.45"
-HorPixels = int(8514)    #7.095"
+VertPixels = int(float(Config.get("PageSize","Height"))*DPI)- TopBuffer - BottomBuffer
+HorPixels = int(float(Config.get("PageSize","Width"))*DPI)- LeftBuffer - RightBuffer
 
 #Page Number Box
 PageNumberBoxHeight = int(582)  #0.485
@@ -74,9 +104,6 @@ RightBorderWeight = int(8)
 
 
 #Fonts
-
-print(Config.get("Fonts","WaypointFont"))
-
 WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
 WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
 PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(float(Config.get("Fonts","PageNumberHeight"))*DPI))
@@ -120,6 +147,9 @@ gps_file = open(TrackFile, 'r')
 gpsdoc = gpxpy.parse(gps_file)
 gps_file.close()
 print("Done parsing track")
+if TrackNumber > len(gpsdoc.tracks) - 1:
+    print("Error, Track number not found in track file: ", TrackNumber)
+    raise IndexError
 
 
 PreviousPoint = (0.0, 0.0)
@@ -386,5 +416,5 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
     del draw
     del drawtxt
 
-    elevplot.save(imageFile + str(PageNumber[Page])+ imageExt, dpi = (1200, 1200))
+    elevplot.save(imageFile + str(PageNumber[Page]).zfill(3)+ imageExt, dpi = (1200, 1200))
 
