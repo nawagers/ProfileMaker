@@ -12,6 +12,8 @@ ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
 
+
+
 #GPX File
 TrackFile = Config.get("InputFiles","TrackFile")
 if not os.path.isabs(TrackFile):
@@ -62,26 +64,28 @@ LeftBuffer = int(float(Config.get("PlotArea","LeftBuffer"))*DPI)
 RightBuffer = int(float(Config.get("PlotArea","RightBuffer"))*DPI)
 TopBuffer = int(float(Config.get("PlotArea","TopBuffer"))*DPI)
 BottomBuffer = int(float(Config.get("PlotArea","BottomBuffer"))*DPI)
-TopWhite= int(240)       #0.2"
-BottomWhite= int(360)    #0.3"
-LeftLine = int(522)
-RightLine = int(522)
+
 
 VertPixels = int(float(Config.get("PageSize","Height"))*DPI)- TopBuffer - BottomBuffer
 HorPixels = int(float(Config.get("PageSize","Width"))*DPI)- LeftBuffer - RightBuffer
 
 #Page Number Box
-PageNumberBoxHeight = int(582)  #0.485
-PageNumberBoxWidth = int(324)   #0.270
-PageNumberBoxBottom = int(1518) #1.265
-PageNumberBoxRight = int(522)   #0.435
-PageNumberBoxColor = (128, 128, 128)
-PageNumberOffset = int(204)
-PageSkips = [] #list(range(1,22))
+PageNumberBoxHeight = int(float(Config.get("PageNumber","Height"))*DPI)
+PageNumberBoxWidth = int(float(Config.get("PageNumber","Width"))*DPI)
+PageNumberBoxBottom = int(float(Config.get("PageNumber","Bottom"))*DPI)
+PageNumberBoxRight = int(float(Config.get("PageNumber","Right"))*DPI)
+PageNumberBoxColor = Config.get("PageNumber","Color")
+PageNumberOffset = int(float(Config.get("PageNumber","NumberBaseline"))*DPI)
+PageSkips = []
+for Page in Config.get("PageNumber","PageSkips").split(','):
+    if len(Page) > 0:
+        PageSkips.append(int(Page))
+
 
 
 #Rendering Variables
-autoElev = False
+autoMinElev = True
+autoMaxElev = False
 minElev = int(0)
 maxElev = int(1700)
 lowElevLine = 0.0
@@ -101,6 +105,11 @@ LeftBorderColor = (0, 0, 0)
 LeftBorderWeight = int(8)
 RightBorderColor = (128, 128, 128)
 RightBorderWeight = int(8)
+TopWhite= int(480)       #0.2"  Top of Left Line
+BottomWhite= int(360)    #0.3"  Bottom of Left Line
+LeftLine = int(522)      # X of Left Line
+RightLine = int(522)     # X of Right Line
+
 
 
 #Fonts
@@ -230,10 +239,33 @@ POIs.sort()
 print()
 print("Minimum Elevation: " + str(MinElevation*MeterToFoot))
 print("Maximum Elevation: " + str(MaxElevation*MeterToFoot))
-if autoElev:
-    ElevationInterval = int((MaxElevation-MinElevation)*MeterToFoot/5)
-    minElev = int(MinElevation*MeterToFoot) - int(MinElevation*MeterToFoot)%ElevationInterval
+
+print(maxElev)
+print(minElev)
+print(ElevationInterval)
+
+if autoMaxElev:
+    print("autoMaxElev")
     maxElev = int(MaxElevation*MeterToFoot)
+    
+if autoMinElev:
+    print("autoMinElev")
+    minElev = int(MinElevation*MeterToFoot)
+    
+if autoMinElev or autoMaxElev:
+    ElevationInterval = int((maxElev-minElev)/5)
+
+print(maxElev)
+print(minElev)
+print(ElevationInterval)
+
+    
+##if autoMaxElev:
+##    ElevationInterval = int((MaxElevation-MinElevation)*MeterToFoot/5)
+##    minElev = int(MinElevation*MeterToFoot) - int(MinElevation*MeterToFoot)%ElevationInterval
+##    print(minElev)
+##    maxElev = int(MaxElevation*MeterToFoot)
+##    print(maxElev)
 
 if autoAdjustPagination:
     Pagination = TotalDistance/max(1,round(TotalDistance/Pagination))
@@ -297,7 +329,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
         draw.line([LeftLine, TopWhite, LeftLine, elevplot.size[0] - BottomWhite], LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
-        draw.line([LeftBuffer+HorPixels+RightBuffer-RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), LeftBuffer+HorPixels+RightBuffer-RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
+        draw.line([elevplot.size[0]-RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), elevplot.size[0]-RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
 
 
         #Elevation intervals
@@ -321,6 +353,8 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             PreviousPoint = CurrentPoint
 
     draw.line(elevPlot,ElevationColor, ElevationWeight)
+    for joint in elevPlot[1:-1]:
+        draw.ellipse((joint[0]-ElevationWeight/2,joint[1]-ElevationWeight/2,joint[0]+ElevationWeight/2,joint[1]+ElevationWeight/2),ElevationColor)
     
     #for joint in elevPlot[1:-1]:
         #draw.ellipse([joint[0]-ElevationWeight/2,joint[1]-ElevationWeight/2,joint[0]+ElevationWeight/2,joint[1]+ElevationWeight/2],ElevationColor)
