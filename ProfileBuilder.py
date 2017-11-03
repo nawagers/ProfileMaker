@@ -84,7 +84,7 @@ for Page in Config.get("PageNumber","PageSkips").split(','):
 
 
 #Rendering Variables
-autoMinElev = True
+autoMinElev = False
 autoMaxElev = False
 minElev = int(0)
 maxElev = int(1700)
@@ -105,7 +105,7 @@ LeftBorderColor = (0, 0, 0)
 LeftBorderWeight = int(8)
 RightBorderColor = (128, 128, 128)
 RightBorderWeight = int(8)
-TopWhite= int(480)       #0.2"  Top of Left Line
+TopWhite= int(240)       #0.2"  Top of Left Line
 BottomWhite= int(360)    #0.3"  Bottom of Left Line
 LeftLine = int(522)      # X of Left Line
 RightLine = int(522)     # X of Right Line
@@ -245,14 +245,15 @@ print(minElev)
 print(ElevationInterval)
 
 if autoMaxElev:
-    print("autoMaxElev")
+    print("Adjusting maximum elevation to " + str(MaxElevation*MeterToFoot))
     maxElev = int(MaxElevation*MeterToFoot)
     
 if autoMinElev:
-    print("autoMinElev")
+    print("Adjusting minimum elevation to " + str(MinElevation*MeterToFoot))
     minElev = int(MinElevation*MeterToFoot)
     
 if autoMinElev or autoMaxElev:
+    print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
     ElevationInterval = int((maxElev-minElev)/5)
 
 print(maxElev)
