@@ -59,23 +59,23 @@ imageExt = ".png"
 
 
 #Areas in pixels
-DPI = int(Config.get("PageSize","DPI"))
-LeftBuffer = int(float(Config.get("PlotArea","LeftBuffer"))*DPI)
-RightBuffer = int(float(Config.get("PlotArea","RightBuffer"))*DPI)
-TopBuffer = int(float(Config.get("PlotArea","TopBuffer"))*DPI)
-BottomBuffer = int(float(Config.get("PlotArea","BottomBuffer"))*DPI)
+DPI = Config.getint("PageSize","DPI")
+LeftBuffer = int(Config.getfloat("PlotArea","LeftBuffer")*DPI)
+RightBuffer = int(Config.getfloat("PlotArea","RightBuffer")*DPI)
+TopBuffer = int(Config.getfloat("PlotArea","TopBuffer")*DPI)
+BottomBuffer = int(Config.getfloat("PlotArea","BottomBuffer")*DPI)
 
 
-VertPixels = int(float(Config.get("PageSize","Height"))*DPI)- TopBuffer - BottomBuffer
-HorPixels = int(float(Config.get("PageSize","Width"))*DPI)- LeftBuffer - RightBuffer
+VertPixels = int(Config.getfloat("PageSize","Height")*DPI)- TopBuffer - BottomBuffer
+HorPixels = int(Config.getfloat("PageSize","Width")*DPI)- LeftBuffer - RightBuffer
 
 #Page Number Box
-PageNumberBoxHeight = int(float(Config.get("PageNumber","Height"))*DPI)
-PageNumberBoxWidth = int(float(Config.get("PageNumber","Width"))*DPI)
-PageNumberBoxBottom = int(float(Config.get("PageNumber","Bottom"))*DPI)
-PageNumberBoxRight = int(float(Config.get("PageNumber","Right"))*DPI)
+PageNumberBoxHeight = int(Config.getfloat("PageNumber","Height")*DPI)
+PageNumberBoxWidth = int(Config.getfloat("PageNumber","Width")*DPI)
+PageNumberBoxBottom = int(Config.getfloat("PageNumber","Bottom")*DPI)
+PageNumberBoxRight = int(Config.getfloat("PageNumber","Right")*DPI)
 PageNumberBoxColor = Config.get("PageNumber","Color")
-PageNumberOffset = int(float(Config.get("PageNumber","NumberBaseline"))*DPI)
+PageNumberOffset = int(Config.getfloat("PageNumber","NumberBaseline")*DPI)
 PageSkips = []
 for Page in Config.get("PageNumber","PageSkips").split(','):
     if len(Page) > 0:
@@ -84,40 +84,40 @@ for Page in Config.get("PageNumber","PageSkips").split(','):
 
 
 #Rendering Variables
-autoMinElev = False
-autoMaxElev = False
-minElev = int(0)
-maxElev = int(1700)
-lowElevLine = 0.0
-ElevationInterval = int(250)
-autoAdjustPagination = True
-Pagination = 10 #Miles per page
-oddSwap = True
+autoMinElev = Config.getboolean("ElevationIntervals","autoMin")
+autoMaxElev = Config.getboolean("ElevationIntervals","autoMax")
+minElev = int(Config.get("ElevationIntervals","Minimum"))
+maxElev = int(Config.get("ElevationIntervals","Maximum"))
+ElevationInterval = int(Config.get("ElevationIntervals","Interval"))
+autoElevInt = Config.getboolean("ElevationIntervals","autoInt")
+autoAdjustPagination = Config.getboolean("Profile","autoFitMiles")
+Pagination = Config.getfloat("Profile","MilesPerPage")
+oddSwap = Config.getboolean("PageLayout","MirrorPages")
 
 #Lines
-BackgroundColor = (255, 255, 255)
-ElevationColor = (152, 152, 152)
-ElevationWeight = int(40)
-ElevationIntervalColor = (128, 128, 128)
-ElevationIntervalWeight = int(8)
-skipzero = True
+BackgroundColor = Config.get("PlotArea","Color")
+ElevationColor = Config.get("Profile","Color")
+ElevationWeight = int(Config.getfloat("Profile","Weight")*DPI)
+ElevationIntervalColor = Config.get("ElevationIntervals","Color")
+ElevationIntervalWeight = int(Config.getfloat("ElevationIntervals","Weight")*DPI)
+skipzero = not Config.getboolean("ElevationIntervals","LabelZero")
 LeftBorderColor = (0, 0, 0)
 LeftBorderWeight = int(8)
 RightBorderColor = (128, 128, 128)
 RightBorderWeight = int(8)
-TopWhite= int(240)       #0.2"  Top of Left Line
-BottomWhite= int(360)    #0.3"  Bottom of Left Line
+TopLeftLine= int(240)       #0.2"  Top of Left Line
+BottomLeftLine= int(360)    #0.3"  Bottom of Left Line
 LeftLine = int(522)      # X of Left Line
 RightLine = int(522)     # X of Right Line
 
 
 
 #Fonts
-WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(float(Config.get("Fonts","PageNumberHeight"))*DPI))
-ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(float(Config.get("Fonts","ElevationAxisHeight"))*DPI))
+WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(Config.getfloat("Fonts","PageNumberHeight")*DPI))
+ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(Config.getfloat("Fonts","ElevationAxisHeight")*DPI))
 
 ElevationAxisBuffer = int(48)
 ElevationAxisCenteringScalar = (1638-1384)/(2*1638.0)+0.5 #Half height of font measured from top (as fraction of whole height)
@@ -125,12 +125,12 @@ ElevationAxisCenteringScalar = (1638-1384)/(2*1638.0)+0.5 #Half height of font m
 
 
 #Waypoint Display
-dteLabel = "SoBo"
-dtsLabel = "NoBo"
-elevLabel = "Elev"
+dteLabel = Config.get("Profile","OppDirectionLabel")
+dtsLabel = Config.get("Profile","DirectionLabel")
+elevLabel = Config.get("Profile","ElevationLabel")
 YAxisLabelEdge = int(450)
-dteEdge = int(624)  #0.52"
-dtsEdge = int(1098) #0.915"
+dteEdge = int(Config.getfloat("Profile","DistanceAheadEdge")*DPI)
+dtsEdge = int(Config.getfloat("Profile","DistanceBehindEdge")*DPI)
 DescriptionEdge = int(1182)
 ElevationEdge = int(240)
 ServicesEdge = int(600)
@@ -285,7 +285,7 @@ PageNumber = list(set(range(1,math.ceil(TotalDistance/Pagination)+1+len(PageSkip
 for Page in range(math.ceil(TotalDistance/Pagination)):
     print("Rendering Page: ", Page + 1, sep='')
     elevplot = Image.new('RGB', (LeftBuffer + RightBuffer + HorPixels, BottomBuffer + TopBuffer + VertPixels), BackgroundColor)
-    txtplot = Image.new('RGBA', (BottomBuffer + TopBuffer + VertPixels, LeftBuffer + RightBuffer + HorPixels),BackgroundColor + (int(0),))
+    txtplot = Image.new('RGBA', (BottomBuffer + TopBuffer + VertPixels, LeftBuffer + RightBuffer + HorPixels), (0,0,0,0))
     draw = ImageDraw.Draw(elevplot)
     drawtxt = ImageDraw.Draw(txtplot)
 
@@ -301,7 +301,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
                   str(PageNumber[Page]),'white', PageNumberFont)
 
         #LeftBorder
-        draw.line([elevplot.size[0] - LeftLine, TopWhite, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomWhite], LeftBorderColor, LeftBorderWeight)
+        draw.line([elevplot.size[0] - LeftLine, TopLeftLine, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomLeftLine], LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
         draw.line([RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
@@ -327,7 +327,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
         draw.text((int(PageNumberBoxRight-PageNumberBoxWidth/2.0-txtWidth/2),elevplot.size[1]-PageNumberBoxBottom-PageNumberBoxHeight + PageNumberOffset - PageNumberFont.font.ascent),str(PageNumber[Page]),'white', PageNumberFont)
 
         #LeftBorder
-        draw.line([LeftLine, TopWhite, LeftLine, elevplot.size[0] - BottomWhite], LeftBorderColor, LeftBorderWeight)
+        draw.line([LeftLine, TopLeftLine, LeftLine, elevplot.size[0] - BottomLeftLine], LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
         draw.line([elevplot.size[0]-RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), elevplot.size[0]-RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
@@ -445,11 +445,11 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
 
     #Rotate and merge text
-    txtplot = txtplot.rotate(90,"1",True)
-    elevplot.paste(txtplot,None, txtplot)
+    txtplot = txtplot.rotate(90, "1" ,True)
+    elevplot.paste(txtplot, None, txtplot)
 
     del draw
     del drawtxt
 
-    elevplot.save(imageFile + str(PageNumber[Page]).zfill(3)+ imageExt, dpi = (1200, 1200))
+    elevplot.save(imageFile + str(PageNumber[Page]).zfill(3)+ imageExt, dpi = (DPI, DPI))
 
