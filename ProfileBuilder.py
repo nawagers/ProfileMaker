@@ -6,6 +6,32 @@ import gpxpy
 import configparser
 import os.path
 
+def wordwrap(text, font, length):
+    lines = []
+    text = text.strip(' ')
+    for paragraph in text.split('\n'):
+        while font.getsize(paragraph)[0] > length:
+            curspace = -1
+            nextspace = paragraph.find(' ')
+            while font.getsize(paragraph[:nextspace])[0] < length:
+                curspace = nextspace
+                nextspace = paragraph.find(' ', nextspace+1)
+                if nextspace == -1:
+                    #no spaces (end occurs on last word)
+                    break
+            if curspace == -1:
+                curspace = 0
+                while font.getsize(paragraph[:curspace])[0] < length:
+                    curspace += 1
+                lines.append(paragraph[:curspace].strip(' '))
+                paragraph = paragraph[curspace:].strip(' ')
+            else:
+                lines.append(paragraph[:curspace].strip(' '))
+                paragraph = paragraph[curspace+1:].strip(' ')
+        if len(paragraph) > 0:
+            lines.append(paragraph)           
+    return(lines)
+
 
 
 ConfigFileName = os.path.abspath("TestData/NET.ini")
@@ -396,6 +422,9 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
     #Render
     for waypoint in POIs:
         if int(waypoint[0]/Pagination) == Page:
+            print()
+            for txtline in wordwrap(waypoint[2],WayPointFont, VertPixels):
+                print(txtline)
             lineX = LeftBuffer + int(((waypoint[0] - Page*Pagination)/Pagination)*HorPixels)
             draw.line([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+ MarkerLength,\
                        lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])],\
