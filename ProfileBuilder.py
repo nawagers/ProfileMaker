@@ -35,7 +35,6 @@ else:
 if not os.path.isfile(WaypointFile):
     print("Waypoint File does not exists: ", WaypointFile)
     raise FileNotFoundError
-
     
 TrackNumber = int(Config.get("InputFiles","TrackNumber"))
 
@@ -48,11 +47,7 @@ if not os.path.isdir(OutputDir):
     print("Error: " + OutputDir + " is not a directory")
     raise NotADirectoryError
 imageFile = os.path.normpath(os.path.join(OutputDir, Config.get("OutputFiles","OutputBase")))
-
 imageExt = ".png"
-
-
-
 
 
 #Display characteristics
@@ -82,7 +77,6 @@ for Page in Config.get("PageNumber","PageSkips").split(','):
         PageSkips.append(int(Page))
 
 
-
 #Rendering Variables
 autoMinElev = Config.getboolean("ElevationIntervals","autoMin")
 autoMaxElev = Config.getboolean("ElevationIntervals","autoMax")
@@ -101,15 +95,14 @@ ElevationWeight = int(Config.getfloat("Profile","Weight")*DPI)
 ElevationIntervalColor = Config.get("ElevationIntervals","Color")
 ElevationIntervalWeight = int(Config.getfloat("ElevationIntervals","Weight")*DPI)
 skipzero = not Config.getboolean("ElevationIntervals","LabelZero")
-LeftBorderColor = (0, 0, 0)
-LeftBorderWeight = int(8)
-RightBorderColor = (128, 128, 128)
-RightBorderWeight = int(8)
-TopLeftLine= int(240)       #0.2"  Top of Left Line
-BottomLeftLine= int(360)    #0.3"  Bottom of Left Line
-LeftLine = int(522)      # X of Left Line
-RightLine = int(522)     # X of Right Line
-
+LeftBorderColor = Config.get("SideLines","LeftColor")
+LeftBorderWeight = int(Config.getfloat("SideLines","LeftWeight")*DPI)
+RightBorderColor = Config.get("SideLines","RightColor")
+RightBorderWeight = int(Config.getfloat("SideLines","RightWeight")*DPI)
+TopLeftLine= int(Config.getfloat("SideLines","LeftTop")*DPI)
+BottomLeftLine= int(Config.getfloat("SideLines","LeftBottom")*DPI)
+LeftLine = int(Config.getfloat("SideLines","LeftHoriz")*DPI)
+RightLine = int(Config.getfloat("SideLines","RightHoriz")*DPI)
 
 
 #Fonts
@@ -119,8 +112,8 @@ PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(Co
 ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
 ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(Config.getfloat("Fonts","ElevationAxisHeight")*DPI))
 
-ElevationAxisBuffer = int(48)
-ElevationAxisCenteringScalar = (1638-1384)/(2*1638.0)+0.5 #Half height of font measured from top (as fraction of whole height)
+ElevationAxisBuffer = int(Config.getfloat("ElevationIntervals","Buffer")*DPI)
+ElevationAxisCenteringScalar = Config.getfloat("ElevationIntervals","LabelOffsetScalar")
 
 
 
@@ -128,21 +121,21 @@ ElevationAxisCenteringScalar = (1638-1384)/(2*1638.0)+0.5 #Half height of font m
 dteLabel = Config.get("Profile","OppDirectionLabel")
 dtsLabel = Config.get("Profile","DirectionLabel")
 elevLabel = Config.get("Profile","ElevationLabel")
-YAxisLabelEdge = int(450)
+YAxisLabelEdge = int(Config.getfloat("Profile","LabelBottom")*DPI)
 dteEdge = int(Config.getfloat("Profile","DistanceAheadEdge")*DPI)
 dtsEdge = int(Config.getfloat("Profile","DistanceBehindEdge")*DPI)
-DescriptionEdge = int(1182)
-ElevationEdge = int(240)
-ServicesEdge = int(600)
-MarkerLength = int(102) #0.085"
-MarkerWeight = int(20)
-TriangleMarkerSize = int(120) #0.1"
-PixelsPerDotLine = int(96)
-DotLineSymbol = '.'
+DescriptionEdge = int(Config.getfloat("Profile","DescriptionEdge")*DPI)
+ElevationEdge = int(Config.getfloat("Profile","ElevationEdge")*DPI)
+ServicesEdge = int(Config.getfloat("Profile","ServicesEdge")*DPI)
+MarkerLength = int(Config.getfloat("Profile","MarkerLength")*DPI)
+MarkerWeight = int(Config.getfloat("Profile","MarkerWeight")*DPI)
+TriangleMarkerSize = int(Config.getfloat("Profile","TriangleSize")*DPI)
+PixelsPerDotLine = int(Config.getfloat("Profile","FillSpacing")*DPI)
+DotLineSymbol = Config.get("Profile","FillSymbol")
 
 #Constants
 MeterToFoot = 3.28084
-MaxWaypointDistance = 0.0094697  #50 ft (in miles)
+MaxWaypointDistance = Config.getfloat("Profile","WaypointDistance")/5280
 
 
 print("Parsing Waypoint file")
@@ -172,6 +165,7 @@ MinElevation = 0
 MaxElevation = 0
 
 
+# list of list [latitude, longitude, comment, serviceglyphs, trianglemaker, offset]
 Waypoints = []
 
 for waypoint in waypointdoc.waypoints:
@@ -240,9 +234,7 @@ print()
 print("Minimum Elevation: " + str(MinElevation*MeterToFoot))
 print("Maximum Elevation: " + str(MaxElevation*MeterToFoot))
 
-print(maxElev)
-print(minElev)
-print(ElevationInterval)
+
 
 if autoMaxElev:
     print("Adjusting maximum elevation to " + str(MaxElevation*MeterToFoot))
@@ -255,10 +247,6 @@ if autoMinElev:
 if autoMinElev or autoMaxElev:
     print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
     ElevationInterval = int((maxElev-minElev)/5)
-
-print(maxElev)
-print(minElev)
-print(ElevationInterval)
 
     
 ##if autoMaxElev:
@@ -390,10 +378,19 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
     #Calculate Offsets
     #Dumb implementation right now, no end bounds, no recursive checking
+
+    FirstPOI = True
+    EndBoundPass = False
     for index in range(len(POIs)-1):
-        if LeftBuffer + int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace > LeftBuffer + int((POIs[index+1][0]/Pagination)*HorPixels):
+        #check if first entry
+        if FirstPOI and int(POIs[index][0]/Pagination) == Page:
+            FirstPOI = False
+            if int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels) - max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) < 0:
+                POIs[index][5] = max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) - int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels)
+        if int(POIs[index+1][0]/Pagination) == Page and \
+           int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace > int((POIs[index+1][0]/Pagination)*HorPixels):
             POIs[index+1][5] =  int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace - int((POIs[index+1][0]/Pagination)*HorPixels)
-       
+       #check bottom (only on last one needed)
 
 
     #Render
