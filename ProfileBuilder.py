@@ -4,109 +4,138 @@ from PIL import Image, ImageDraw, ImageFont
 import math
 import gpxpy
 import configparser
+import os.path
 
 
-ConfigFileName = "c:/Users/GuestUser/Documents/Nick/ProfileBuilder/TestData/NET.ini"
+
+ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
 
+
+
 #GPX File
 TrackFile = Config.get("InputFiles","TrackFile")
+if not os.path.isabs(TrackFile):
+    TrackFile = os.path.normpath(os.path.join(os.path.dirname(ConfigFileName),TrackFile))
+else:
+    TrackFile = os.path.normpath(TrackFile)
+if not os.path.isfile(TrackFile):
+    print("Track File does not exists: ", TrackFile)
+    raise FileNotFoundError
+
+  
 WaypointFile = Config.get("InputFiles","WaypointFile")
 if len(WaypointFile) == 0:
-    WaypointFile = Trackfile
+    WaypointFile = TrackFile
+elif not os.path.isabs(WaypointFile):
+    WaypointFile = os.path.normpath(os.path.join(os.path.dirname(ConfigFileName),WaypointFile))
+else:
+    WaypointFile = os.path.normpath(WaypointFile)
+if not os.path.isfile(WaypointFile):
+    print("Waypoint File does not exists: ", WaypointFile)
+    raise FileNotFoundError
+    
 TrackNumber = int(Config.get("InputFiles","TrackNumber"))
 
-#PlotSave
-imageFile = "c:/Users/GuestUser/Documents/Nick/ProfileBuilder/Guidebook/NET Main"
-imageExt = ".png"
 
+#PlotSave
+OutputDir = Config.get("OutputFiles","OutputDir")
+if not os.path.isabs(OutputDir):
+    OutputDir = os.path.join(os.path.dirname(ConfigFileName),OutputDir)
+if not os.path.isdir(OutputDir):
+    print("Error: " + OutputDir + " is not a directory")
+    raise NotADirectoryError
+imageFile = os.path.normpath(os.path.join(OutputDir, Config.get("OutputFiles","OutputBase")))
+imageExt = ".png"
 
 
 #Display characteristics
 
 
 #Areas in pixels
-DPI = int(1200)
-LeftBuffer = int(564)    #0.435"
-RightBuffer = int(522)   #0.435"
-TopBuffer = int(540)     #0.45"
-BottomBuffer = int(1560) #1.3"
-TopWhite= int(240)       #0.2"
-BottomWhite= int(360)    #0.3"
-LeftLine = int(522)
-RightLine = int(522)
+DPI = Config.getint("PageSize","DPI")
+LeftBuffer = int(Config.getfloat("PlotArea","LeftBuffer")*DPI)
+RightBuffer = int(Config.getfloat("PlotArea","RightBuffer")*DPI)
+TopBuffer = int(Config.getfloat("PlotArea","TopBuffer")*DPI)
+BottomBuffer = int(Config.getfloat("PlotArea","BottomBuffer")*DPI)
 
-VertPixels = int(4140)   #3.45"
-HorPixels = int(8514)    #7.095"
+
+VertPixels = int(Config.getfloat("PageSize","Height")*DPI)- TopBuffer - BottomBuffer
+HorPixels = int(Config.getfloat("PageSize","Width")*DPI)- LeftBuffer - RightBuffer
 
 #Page Number Box
-PageNumberBoxHeight = int(582)  #0.485
-PageNumberBoxWidth = int(324)   #0.270
-PageNumberBoxBottom = int(1518) #1.265
-PageNumberBoxRight = int(522)   #0.435
-PageNumberBoxColor = (128, 128, 128)
-PageNumberOffset = int(204)
-PageSkips = [] #list(range(1,22))
+PageNumberBoxHeight = int(Config.getfloat("PageNumber","Height")*DPI)
+PageNumberBoxWidth = int(Config.getfloat("PageNumber","Width")*DPI)
+PageNumberBoxBottom = int(Config.getfloat("PageNumber","Bottom")*DPI)
+PageNumberBoxRight = int(Config.getfloat("PageNumber","Right")*DPI)
+PageNumberBoxColor = Config.get("PageNumber","Color")
+PageNumberOffset = int(Config.getfloat("PageNumber","NumberBaseline")*DPI)
+PageSkips = []
+for Page in Config.get("PageNumber","PageSkips").split(','):
+    if len(Page) > 0:
+        PageSkips.append(int(Page))
 
 
 #Rendering Variables
-autoElev = False
-minElev = int(0)
-maxElev = int(1700)
-lowElevLine = 0.0
-ElevationInterval = int(250)
-autoAdjustPagination = True
-Pagination = 10 #Miles per page
-oddSwap = True
+autoMinElev = Config.getboolean("ElevationIntervals","autoMin")
+autoMaxElev = Config.getboolean("ElevationIntervals","autoMax")
+minElev = int(Config.get("ElevationIntervals","Minimum"))
+maxElev = int(Config.get("ElevationIntervals","Maximum"))
+ElevationInterval = int(Config.get("ElevationIntervals","Interval"))
+autoElevInt = Config.getboolean("ElevationIntervals","autoInt")
+autoAdjustPagination = Config.getboolean("Profile","autoFitMiles")
+Pagination = Config.getfloat("Profile","MilesPerPage")
+oddSwap = Config.getboolean("PageLayout","MirrorPages")
 
 #Lines
-BackgroundColor = (255, 255, 255)
-ElevationColor = (152, 152, 152)
-ElevationWeight = int(40)
-ElevationIntervalColor = (128, 128, 128)
-ElevationIntervalWeight = int(8)
-skipzero = True
-LeftBorderColor = (0, 0, 0)
-LeftBorderWeight = int(8)
-RightBorderColor = (128, 128, 128)
-RightBorderWeight = int(8)
+BackgroundColor = Config.get("PlotArea","Color")
+ElevationColor = Config.get("Profile","Color")
+ElevationWeight = int(Config.getfloat("Profile","Weight")*DPI)
+ElevationIntervalColor = Config.get("ElevationIntervals","Color")
+ElevationIntervalWeight = int(Config.getfloat("ElevationIntervals","Weight")*DPI)
+skipzero = not Config.getboolean("ElevationIntervals","LabelZero")
+LeftBorderColor = Config.get("SideLines","LeftColor")
+LeftBorderWeight = int(Config.getfloat("SideLines","LeftWeight")*DPI)
+RightBorderColor = Config.get("SideLines","RightColor")
+RightBorderWeight = int(Config.getfloat("SideLines","RightWeight")*DPI)
+TopLeftLine= int(Config.getfloat("SideLines","LeftTop")*DPI)
+BottomLeftLine= int(Config.getfloat("SideLines","LeftBottom")*DPI)
+LeftLine = int(Config.getfloat("SideLines","LeftHoriz")*DPI)
+RightLine = int(Config.getfloat("SideLines","RightHoriz")*DPI)
 
 
 #Fonts
+WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(Config.getfloat("Fonts","PageNumberHeight")*DPI))
+ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(Config.getfloat("Fonts","ElevationAxisHeight")*DPI))
 
-print(Config.get("Fonts","WaypointFont"))
-
-WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(float(Config.get("Fonts","PageNumberHeight"))*DPI))
-ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(float(Config.get("Fonts","WaypointHeight"))*DPI))
-ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(float(Config.get("Fonts","ElevationAxisHeight"))*DPI))
-
-ElevationAxisBuffer = int(48)
-ElevationAxisCenteringScalar = (1638-1384)/(2*1638.0)+0.5 #Half height of font measured from top (as fraction of whole height)
+ElevationAxisBuffer = int(Config.getfloat("ElevationIntervals","Buffer")*DPI)
+ElevationAxisCenteringScalar = Config.getfloat("ElevationIntervals","LabelOffsetScalar")
 
 
 
 #Waypoint Display
-dteLabel = "SoBo"
-dtsLabel = "NoBo"
-elevLabel = "Elev"
-YAxisLabelEdge = int(450)
-dteEdge = int(624)  #0.52"
-dtsEdge = int(1098) #0.915"
-DescriptionEdge = int(1182)
-ElevationEdge = int(240)
-ServicesEdge = int(600)
-MarkerLength = int(102) #0.085"
-MarkerWeight = int(20)
-TriangleMarkerSize = int(120) #0.1"
-PixelsPerDotLine = int(96)
-DotLineSymbol = '.'
+dteLabel = Config.get("Profile","OppDirectionLabel")
+dtsLabel = Config.get("Profile","DirectionLabel")
+elevLabel = Config.get("Profile","ElevationLabel")
+YAxisLabelEdge = int(Config.getfloat("Profile","LabelBottom")*DPI)
+dteEdge = int(Config.getfloat("Profile","DistanceAheadEdge")*DPI)
+dtsEdge = int(Config.getfloat("Profile","DistanceBehindEdge")*DPI)
+DescriptionEdge = int(Config.getfloat("Profile","DescriptionEdge")*DPI)
+ElevationEdge = int(Config.getfloat("Profile","ElevationEdge")*DPI)
+ServicesEdge = int(Config.getfloat("Profile","ServicesEdge")*DPI)
+MarkerLength = int(Config.getfloat("Profile","MarkerLength")*DPI)
+MarkerWeight = int(Config.getfloat("Profile","MarkerWeight")*DPI)
+TriangleMarkerSize = int(Config.getfloat("Profile","TriangleSize")*DPI)
+PixelsPerDotLine = int(Config.getfloat("Profile","FillSpacing")*DPI)
+DotLineSymbol = Config.get("Profile","FillSymbol")
 
 #Constants
 MeterToFoot = 3.28084
-MaxWaypointDistance = 0.0094697  #50 ft (in miles)
+MaxWaypointDistance = Config.getfloat("Profile","WaypointDistance")/5280
 
 
 print("Parsing Waypoint file")
@@ -120,6 +149,9 @@ gps_file = open(TrackFile, 'r')
 gpsdoc = gpxpy.parse(gps_file)
 gps_file.close()
 print("Done parsing track")
+if TrackNumber > len(gpsdoc.tracks) - 1:
+    print("Error, Track number not found in track file: ", TrackNumber)
+    raise IndexError
 
 
 PreviousPoint = (0.0, 0.0)
@@ -133,6 +165,7 @@ MinElevation = 0
 MaxElevation = 0
 
 
+# list of list [latitude, longitude, comment, serviceglyphs, trianglemaker, offset]
 Waypoints = []
 
 for waypoint in waypointdoc.waypoints:
@@ -200,10 +233,28 @@ POIs.sort()
 print()
 print("Minimum Elevation: " + str(MinElevation*MeterToFoot))
 print("Maximum Elevation: " + str(MaxElevation*MeterToFoot))
-if autoElev:
-    ElevationInterval = int((MaxElevation-MinElevation)*MeterToFoot/5)
-    minElev = int(MinElevation*MeterToFoot) - int(MinElevation*MeterToFoot)%ElevationInterval
+
+
+
+if autoMaxElev:
+    print("Adjusting maximum elevation to " + str(MaxElevation*MeterToFoot))
     maxElev = int(MaxElevation*MeterToFoot)
+    
+if autoMinElev:
+    print("Adjusting minimum elevation to " + str(MinElevation*MeterToFoot))
+    minElev = int(MinElevation*MeterToFoot)
+    
+if autoMinElev or autoMaxElev:
+    print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
+    ElevationInterval = int((maxElev-minElev)/5)
+
+    
+##if autoMaxElev:
+##    ElevationInterval = int((MaxElevation-MinElevation)*MeterToFoot/5)
+##    minElev = int(MinElevation*MeterToFoot) - int(MinElevation*MeterToFoot)%ElevationInterval
+##    print(minElev)
+##    maxElev = int(MaxElevation*MeterToFoot)
+##    print(maxElev)
 
 if autoAdjustPagination:
     Pagination = TotalDistance/max(1,round(TotalDistance/Pagination))
@@ -222,7 +273,7 @@ PageNumber = list(set(range(1,math.ceil(TotalDistance/Pagination)+1+len(PageSkip
 for Page in range(math.ceil(TotalDistance/Pagination)):
     print("Rendering Page: ", Page + 1, sep='')
     elevplot = Image.new('RGB', (LeftBuffer + RightBuffer + HorPixels, BottomBuffer + TopBuffer + VertPixels), BackgroundColor)
-    txtplot = Image.new('RGBA', (BottomBuffer + TopBuffer + VertPixels, LeftBuffer + RightBuffer + HorPixels),BackgroundColor + (int(0),))
+    txtplot = Image.new('RGBA', (BottomBuffer + TopBuffer + VertPixels, LeftBuffer + RightBuffer + HorPixels), (0,0,0,0))
     draw = ImageDraw.Draw(elevplot)
     drawtxt = ImageDraw.Draw(txtplot)
 
@@ -238,7 +289,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
                   str(PageNumber[Page]),'white', PageNumberFont)
 
         #LeftBorder
-        draw.line([elevplot.size[0] - LeftLine, TopWhite, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomWhite], LeftBorderColor, LeftBorderWeight)
+        draw.line([elevplot.size[0] - LeftLine, TopLeftLine, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomLeftLine], LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
         draw.line([RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
@@ -264,10 +315,10 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
         draw.text((int(PageNumberBoxRight-PageNumberBoxWidth/2.0-txtWidth/2),elevplot.size[1]-PageNumberBoxBottom-PageNumberBoxHeight + PageNumberOffset - PageNumberFont.font.ascent),str(PageNumber[Page]),'white', PageNumberFont)
 
         #LeftBorder
-        draw.line([LeftLine, TopWhite, LeftLine, elevplot.size[0] - BottomWhite], LeftBorderColor, LeftBorderWeight)
+        draw.line([LeftLine, TopLeftLine, LeftLine, elevplot.size[0] - BottomLeftLine], LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
-        draw.line([LeftBuffer+HorPixels+RightBuffer-RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), LeftBuffer+HorPixels+RightBuffer-RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
+        draw.line([elevplot.size[0]-RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), elevplot.size[0]-RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
 
 
         #Elevation intervals
@@ -291,6 +342,8 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             PreviousPoint = CurrentPoint
 
     draw.line(elevPlot,ElevationColor, ElevationWeight)
+    for joint in elevPlot[1:-1]:
+        draw.ellipse((joint[0]-ElevationWeight/2,joint[1]-ElevationWeight/2,joint[0]+ElevationWeight/2,joint[1]+ElevationWeight/2),ElevationColor)
     
     #for joint in elevPlot[1:-1]:
         #draw.ellipse([joint[0]-ElevationWeight/2,joint[1]-ElevationWeight/2,joint[0]+ElevationWeight/2,joint[1]+ElevationWeight/2],ElevationColor)
@@ -325,10 +378,19 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
     #Calculate Offsets
     #Dumb implementation right now, no end bounds, no recursive checking
+
+    FirstPOI = True
+    EndBoundPass = False
     for index in range(len(POIs)-1):
-        if LeftBuffer + int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace > LeftBuffer + int((POIs[index+1][0]/Pagination)*HorPixels):
+        #check if first entry
+        if FirstPOI and int(POIs[index][0]/Pagination) == Page:
+            FirstPOI = False
+            if int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels) - max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) < 0:
+                POIs[index][5] = max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) - int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels)
+        if int(POIs[index+1][0]/Pagination) == Page and \
+           int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace > int((POIs[index+1][0]/Pagination)*HorPixels):
             POIs[index+1][5] =  int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace - int((POIs[index+1][0]/Pagination)*HorPixels)
-       
+       #check bottom (only on last one needed)
 
 
     #Render
@@ -380,11 +442,11 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
 
     #Rotate and merge text
-    txtplot = txtplot.rotate(90,"1",True)
-    elevplot.paste(txtplot,None, txtplot)
+    txtplot = txtplot.rotate(90, "1" ,True)
+    elevplot.paste(txtplot, None, txtplot)
 
     del draw
     del drawtxt
 
-    elevplot.save(imageFile + str(PageNumber[Page])+ imageExt, dpi = (1200, 1200))
+    elevplot.save(imageFile + str(PageNumber[Page]).zfill(3)+ imageExt, dpi = (DPI, DPI))
 

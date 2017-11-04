@@ -1,0 +1,552 @@
+﻿<?xml version="1.0" encoding="utf-8"?><gpx creator="Garmin Desktop App" version="1.1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/ActivityExtension/v1 http://www8.garmin.com/xmlschemas/ActivityExtensionv1.xsd http://www.garmin.com/xmlschemas/AdventuresExtensions/v1 http://www8.garmin.com/xmlschemas/AdventuresExtensionv1.xsd http://www.garmin.com/xmlschemas/PressureExtension/v1 http://www.garmin.com/xmlschemas/PressureExtensionv1.xsd http://www.garmin.com/xmlschemas/TripExtensions/v1 http://www.garmin.com/xmlschemas/TripExtensionsv1.xsd http://www.garmin.com/xmlschemas/TripMetaDataExtensions/v1 http://www.garmin.com/xmlschemas/TripMetaDataExtensionsv1.xsd http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensions/v1 http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensionsv1.xsd http://www.garmin.com/xmlschemas/CreationTimeExtension/v1 http://www.garmin.com/xmlschemas/CreationTimeExtensionsv1.xsd http://www.garmin.com/xmlschemas/AccelerationExtension/v1 http://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd http://www.garmin.com/xmlschemas/PowerExtension/v1 http://www.garmin.com/xmlschemas/PowerExtensionv1.xsd http://www.garmin.com/xmlschemas/VideoExtension/v1 http://www.garmin.com/xmlschemas/VideoExtensionv1.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wptx1="http://www.garmin.com/xmlschemas/WaypointExtension/v1" xmlns:gpxtrx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:trp="http://www.garmin.com/xmlschemas/TripExtensions/v1" xmlns:adv="http://www.garmin.com/xmlschemas/AdventuresExtensions/v1" xmlns:prs="http://www.garmin.com/xmlschemas/PressureExtension/v1" xmlns:tmd="http://www.garmin.com/xmlschemas/TripMetaDataExtensions/v1" xmlns:vptm="http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensions/v1" xmlns:ctx="http://www.garmin.com/xmlschemas/CreationTimeExtension/v1" xmlns:gpxacc="http://www.garmin.com/xmlschemas/AccelerationExtension/v1" xmlns:gpxpx="http://www.garmin.com/xmlschemas/PowerExtension/v1" xmlns:vidx1="http://www.garmin.com/xmlschemas/VideoExtension/v1">
+
+  <metadata>
+    <link href="http://www.garmin.com">
+      <text>Garmin International</text>
+    </link>
+    <time>2017-11-03T18:28:16Z</time>
+    <bounds maxlat="41.469431994482875" maxlon="-72.645526975393295" minlat="41.405833968892694" minlon="-72.683802014216781" />
+  </metadata>
+
+  <wpt lat="41.469261003658175" lon="-72.651011003181338">
+    <ele>197.02484100000001</ele>
+    <time>2017-09-22T17:10:21Z</time>
+    <name>Bear Rock</name>
+    <cmt>Bear Rock, views</cmt>
+    <desc>Bear Rock, views</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T17:10:21Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.469431994482875" lon="-72.65069198794663">
+    <ele>192.50486799999999</ele>
+    <time>2017-09-22T17:11:21Z</time>
+    <name>Bear Rock Bypass N</name>
+    <cmt>Bear Rock Bypass</cmt>
+    <desc>Bear Rock Bypass</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T17:11:21Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.468907035887241" lon="-72.650611018761992">
+    <ele>186.99542199999999</ele>
+    <time>2017-09-22T17:04:58Z</time>
+    <name>Bear Rock Bypass S</name>
+    <cmt>Bear Rock Bypass</cmt>
+    <desc>Bear Rock Bypass</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T17:04:58Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.443447005003691" lon="-72.675522034987807">
+    <ele>125.80368</ele>
+    <time>2017-09-22T14:06:45Z</time>
+    <name>Chalker Brook</name>
+    <cmt>Chalker Brook</cmt>
+    <desc>Chalker Brook</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T14:06:45Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.42271101474762" lon="-72.673341985791922">
+    <ele>148.30017100000001</ele>
+    <time>2017-09-22T12:53:48Z</time>
+    <name>Charcoal Site</name>
+    <cmt>Charcoal Site</cmt>
+    <desc>Charcoal Site</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T12:53:48Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.419277032837272" lon="-72.674807980656624">
+    <ele>139.64485199999999</ele>
+    <time>2017-09-22T12:39:24Z</time>
+    <name>Coan Pond and Rockland Parking</name>
+    <cmt>Privy (0.1E), Rockland Preserve Parking (0.2E) along Lone Pine Trail (Blue/Red) and Dave Houston Trail (Red) to Renee's Way</cmt>
+    <desc>Privy (0.1E), Rockland Preserve Parking (0.2E) along Lone Pine Trail (Blue/Red) and Dave Houston Trail (Red) to Renee's Way</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T12:39:24Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.452350011095405" lon="-72.671456979587674">
+    <ele>97.415131000000002</ele>
+    <time>2017-09-22T14:56:25Z</time>
+    <name>Cream Pot Brook</name>
+    <cmt>Cream Pot Brook</cmt>
+    <desc>Cream Pot Brook</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T14:56:25Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.465438017621636" lon="-72.645526975393295">
+    <ele>180.45796200000001</ele>
+    <time>2017-09-22T16:39:38Z</time>
+    <name>Harvey Road</name>
+    <cmt>Harvey Road</cmt>
+    <desc>Harvey Road</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T16:39:38Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.461690971627831" lon="-72.646009018644691">
+    <ele>164.843842</ele>
+    <time>2017-09-22T16:32:24Z</time>
+    <name>Higganum Road</name>
+    <cmt>Higganum Road</cmt>
+    <desc>Higganum Road</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T16:32:24Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.446802029386163" lon="-72.673389008268714">
+    <ele>200.04826399999999</ele>
+    <time>2017-09-22T14:33:45Z</time>
+    <name>Mt Pisgah</name>
+    <cmt>Mt Pisgah, views 80 ft W</cmt>
+    <desc>Mt Pisgah, views 80 ft W</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T14:33:45Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.405833968892694" lon="-72.683802014216781">
+    <ele>150.32757599999999</ele>
+    <time>2017-09-04T20:50:16Z</time>
+    <name>NET Split</name>
+    <cmt>NET spur to E. Eastern terminus 26.5 miles</cmt>
+    <desc>NET spur to E. Eastern terminus 26.5 miles</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-04T20:50:16Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.459815017879009" lon="-72.662149965763092">
+    <ele>145.18710300000001</ele>
+    <time>2017-09-22T15:14:36Z</time>
+    <name>Old Blue Hills Road</name>
+    <cmt>Old Blue Hills Road - NOBO contine on trail to E, limited parking on shoulder</cmt>
+    <desc>Old Blue Hills Road - NOBO contine on trail to E, limited parking on shoulder</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T15:14:36Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.42205529846251" lon="-72.674120664596558">
+    <ele>154.28515625</ele>
+    <time>2017-10-26T22:44:42Z</time>
+    <name>Parking</name>
+    <cmt>Parking, Braemore Preserve, 1.1W along Bridle Trail (yellow) then Lone Pine Trail (Blue/Red)</cmt>
+    <desc>Parking, Braemore Preserve, 1.1W along Bridle Trail (yellow) then Lone Pine Trail (Blue/Red)</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-10-26T22:44:42Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.442459365352988" lon="-72.675415752455592">
+    <ele>140.7265625</ele>
+    <time>2017-10-26T22:53:18Z</time>
+    <name>Parking 2</name>
+    <cmt>Parking, 0.1W to Cream Pot Road on Selectmen's Path (Blue/Yellow)</cmt>
+    <desc>Parking, 0.1W to Cream Pot Road on Selectmen's Path (Blue/Yellow)</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-10-26T22:53:18Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.449566800147295" lon="-72.668256601318717">
+    <ele>127.58984375</ele>
+    <time>2017-10-26T23:03:37Z</time>
+    <name>Parking 3</name>
+    <cmt>Limited parking on shoulder</cmt>
+    <desc>Limited parking on shoulder</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+        <gpxx:Address>
+          <gpxx:StreetAddress>110 Pisgah Rd</gpxx:StreetAddress>
+          <gpxx:City>Durham Twn</gpxx:City>
+          <gpxx:State>CT</gpxx:State>
+          <gpxx:Country>USA</gpxx:Country>
+          <gpxx:PostalCode>06422</gpxx:PostalCode>
+        </gpxx:Address>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+        <wptx1:Address>
+          <wptx1:StreetAddress>110 Pisgah Rd</wptx1:StreetAddress>
+          <wptx1:City>Durham Twn</wptx1:City>
+          <wptx1:State>CT</wptx1:State>
+          <wptx1:Country>USA</wptx1:Country>
+          <wptx1:PostalCode>06422</wptx1:PostalCode>
+        </wptx1:Address>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-10-26T23:03:37Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.448348993435502" lon="-72.667928030714393">
+    <ele>126.55321499999999</ele>
+    <time>2017-09-22T14:49:05Z</time>
+    <name>Pisgah Road</name>
+    <cmt>Pisgah Road - NOBO continue W</cmt>
+    <desc>Pisgah Road - NOBO continue W</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T14:49:05Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.454892158508301" lon="-72.672135829925537">
+    <ele>101.36328125</ele>
+    <time>2017-10-26T13:37:54Z</time>
+    <name>Pisgah Road + Old Blue Hills Road</name>
+    <cmt>5-way intersection - NOBO leave Pisgah Road, cross Madison Road (CT79), continue on Old Blue Hills Road, Restaurants (BLD) 0.8W, Durham, CT 1.8W</cmt>
+    <desc>5-way intersection - NOBO leave Pisgah Road, cross Madison Road (CT79), continue on Old Blue Hills Road, Restaurants (BLD) 0.8W, Durham, CT 1.8W</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-10-26T13:37:54Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.44142696633935" lon="-72.678421000018716">
+    <ele>141.09252900000001</ele>
+    <time>2017-09-22T13:54:00Z</time>
+    <name>Pyramid Rock</name>
+    <cmt>Pyramid Rock, large glacial erratic</cmt>
+    <desc>Pyramid Rock, large glacial erratic</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T13:54:00Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.458044005557895" lon="-72.655413011088967">
+    <ele>140.103577</ele>
+    <time>2017-09-22T15:50:34Z</time>
+    <name>Rock Overhang</name>
+    <cmt>Rock Overhang</cmt>
+    <desc>Rock Overhang</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T15:50:34Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.420417977496982" lon="-72.674291990697384">
+    <ele>151.909515</ele>
+    <time>2017-09-22T12:42:20Z</time>
+    <name>Rockland Preserve Camping</name>
+    <cmt>Rockland Preserve Camping (0.1E) Tent platforms, fire pit, 3 privies - one at site, 2 more just past camping area on Dave Houston Trail, water at Coan Pond 0.1E, access is muddy.</cmt>
+    <desc>Rockland Preserve Camping (0.1E) Tent platforms, fire pit, 3 privies - one at site, 2 more just past camping area on Dave Houston Trail, water at Coan Pond 0.1E, access is muddy.</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T12:42:20Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.444938983768225" lon="-72.674422999843955">
+    <ele>158.38119499999999</ele>
+    <time>2017-09-22T14:22:27Z</time>
+    <name>Scenic View 4</name>
+    <cmt>Scenic View 150 ft E</cmt>
+    <desc>Scenic View 150 ft E</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T14:22:27Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.431469013914466" lon="-72.676068032160401">
+    <ele>161.70491000000001</ele>
+    <time>2017-09-22T13:16:31Z</time>
+    <name>Scenic View 8</name>
+    <cmt>Views</cmt>
+    <desc>Views</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T13:16:31Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.435291999951005" lon="-72.680259989574552">
+    <ele>154.508881</ele>
+    <time>2017-09-22T13:34:43Z</time>
+    <name>Scenic View 9</name>
+    <cmt>Views
+</cmt>
+    <desc>Views
+</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T13:34:43Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.436400003731251" lon="-72.680183965712786">
+    <ele>177.590317</ele>
+    <time>2017-09-22T13:37:40Z</time>
+    <name>Scenic Views 10</name>
+    <cmt>Views</cmt>
+    <desc>Views</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T13:37:40Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="41.433516964316368" lon="-72.678586039692163">
+    <ele>132.13687100000001</ele>
+    <time>2017-09-22T13:27:48Z</time>
+    <name>Unnamed Stream 6</name>
+    <cmt>Small Stream</cmt>
+    <desc>Small Stream</desc>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2017-09-22T13:27:48Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+
+</gpx>
