@@ -6,14 +6,15 @@ import gpxpy
 import configparser
 import os.path
 
-def wordwrap(text, font, length):
+def wordwrap(text, font, lengths):
     lines = []
+    limits = list(lengths)
     text = text.strip(' ')
     for paragraph in text.split('\n'):
-        while font.getsize(paragraph)[0] > length:
+        while font.getsize(paragraph)[0] > limits[0]:
             curspace = -1
             nextspace = paragraph.find(' ')
-            while font.getsize(paragraph[:nextspace])[0] < length:
+            while font.getsize(paragraph[:nextspace])[0] < limits[0]:
                 curspace = nextspace
                 nextspace = paragraph.find(' ', nextspace+1)
                 if nextspace == -1:
@@ -21,15 +22,18 @@ def wordwrap(text, font, length):
                     break
             if curspace == -1:
                 curspace = 0
-                while font.getsize(paragraph[:curspace])[0] < length:
+                while font.getsize(paragraph[:curspace])[0] < limits[0]:
                     curspace += 1
                 lines.append(paragraph[:curspace].strip(' '))
+                if len(limits) > 1: limits.pop(0)
                 paragraph = paragraph[curspace:].strip(' ')
             else:
                 lines.append(paragraph[:curspace].strip(' '))
+                if len(limits) > 1: limits.pop(0)
                 paragraph = paragraph[curspace+1:].strip(' ')
         if len(paragraph) > 0:
-            lines.append(paragraph)           
+            lines.append(paragraph)
+            if len(limits) > 1: limits.pop(0)
     return(lines)
 
 
@@ -151,6 +155,7 @@ YAxisLabelEdge = int(Config.getfloat("Profile","LabelBottom")*DPI)
 dteEdge = int(Config.getfloat("Profile","DistanceAheadEdge")*DPI)
 dtsEdge = int(Config.getfloat("Profile","DistanceBehindEdge")*DPI)
 DescriptionEdge = int(Config.getfloat("Profile","DescriptionEdge")*DPI)
+DescriptionMaxLength = int(Config.getfloat("Profile","DescriptionMaxLength")*DPI)
 ElevationEdge = int(Config.getfloat("Profile","ElevationEdge")*DPI)
 ServicesEdge = int(Config.getfloat("Profile","ServicesEdge")*DPI)
 MarkerLength = int(Config.getfloat("Profile","MarkerLength")*DPI)
@@ -423,7 +428,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
     for waypoint in POIs:
         if int(waypoint[0]/Pagination) == Page:
             print()
-            for txtline in wordwrap(waypoint[2],WayPointFont, VertPixels):
+            for txtline in wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength]):
                 print(txtline)
             lineX = LeftBuffer + int(((waypoint[0] - Page*Pagination)/Pagination)*HorPixels)
             draw.line([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+ MarkerLength,\
@@ -446,9 +451,9 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             drawtxt.text((dtsEdge-txtWidth,lineX + waypoint[5]-WayPointFontBold.font.ascent),DTS,'black', WayPointFontBold)
 
             #Description of waypoint
-            txtWidth, txtHeight = WayPointFont.getsize(waypoint[2])
+            txtWidth, txtHeight = WayPointFont.getsize(wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength])[0])
             EndDesc = DescriptionEdge+txtWidth
-            drawtxt.text((DescriptionEdge,lineX + waypoint[5]-WayPointFont.font.ascent),waypoint[2],'black', WayPointFont)
+            drawtxt.text((DescriptionEdge,lineX + waypoint[5]-WayPointFont.font.ascent),wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength])[0],'black', WayPointFont)
 
             #Elevation
             Elevation = "%.0f" % round(waypoint[1])
