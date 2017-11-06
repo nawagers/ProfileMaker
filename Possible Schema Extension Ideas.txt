@@ -1,0 +1,6 @@
+Attributes to encompass:
+
+Forward text
+Reverse text
+Services
+Distance Alignment
