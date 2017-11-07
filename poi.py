@@ -37,15 +37,15 @@ class POI:
     def wordwrap(self, lengths, backward=False):
         text = self.backwardtext if backward else self.forwardtext
         lines = []
-        limits = list(lengths)
+        currentline = 0
         text = text.strip(' ')
         for paragraph in text.split('\n'):
             # Run each paragraph separate to preserve line breaks
-            while self.textfont.getsize(paragraph)[0] > limits[0]:
+            while self.textfont.getsize(paragraph)[0] > lengths[currentline]:
                 # Remaining text exceeds max, find split point
                 curspace = -1
                 nextspace = paragraph.find(' ')
-                while self.textfont.getsize(paragraph[:nextspace])[0] < limits[0]:
+                while self.textfont.getsize(paragraph[:nextspace])[0] < lengths[currentline]:
                     # next word still fits on line
                     curspace = nextspace
                     nextspace = paragraph.find(' ', nextspace+1)
@@ -55,19 +55,22 @@ class POI:
                 if curspace == -1:
                     # current word exceed max by itself
                     curspace = 0
-                    while self.textfont.getsize(paragraph[:curspace])[0] < limits[0]:
+                    while self.textfont.getsize(paragraph[:curspace])[0] < lengths[currentline]:
                         # find the last character that fits
                         curspace += 1
                     lines.append(paragraph[:curspace].strip(' '))
-                    if len(limits) > 1: limits.pop(0)
+                    if currentline < len(lengths)-1: 
+                        currentline += 1
                     paragraph = paragraph[curspace:].strip(' ')
                 else:
                     # current word is last one that fits
                     lines.append(paragraph[:curspace].strip(' '))
-                    if len(limits) > 1: limits.pop(0)
+                    if currentline < len(lengths)-1: 
+                        currentline += 1
                     paragraph = paragraph[curspace+1:].strip(' ')
             if len(paragraph) > 0:
                 # remaining text is less than max length
                 lines.append(paragraph)
-                if len(limits) > 1: limits.pop(0)
+                if currentline < len(lengths)-1: 
+                        currentline += 1
         return(lines)

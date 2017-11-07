@@ -177,7 +177,6 @@ DotLineSymbol = Config.get("Profile","FillSymbol")
 MeterToFoot = 3.28084
 MaxWaypointDistance = Config.getfloat("Profile","WaypointDistance")/5280
 
-
 print("Parsing Waypoint file")
 waypoints_file = open(WaypointFile, 'r')
 waypointdoc = gpxpy.parse(waypoints_file)
@@ -252,7 +251,6 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
             if  vincenty(CurrentPoint, (Waypoints[waypoint+skipper][0],Waypoints[waypoint+skipper][1])).miles < MaxWaypointDistance:
                 if Waypoints[waypoint+skipper][2] != "":
                     POIs.append(POI(TotalDistance, CurrentElevation*MeterToFoot,Waypoints[waypoint+skipper][2],WayPointFont, services=Waypoints[waypoint+skipper][3]))
-                    print(Waypoints[waypoint+skipper][3])
                 else:
                     print("Empty Waypoint:")
                     print(Waypoint[waypoint+skipper])
@@ -301,7 +299,6 @@ if len(Waypoints) > 0:
     print("Warning: Unmatched waypoints-")
     print(Waypoints)
 
-print("probably a bug here")
 print("Generating " + str(math.ceil(TotalDistance/Pagination)) + " pages")
 
 PageNumber = list(set(range(1,math.ceil(TotalDistance/Pagination)+1+len(PageSkips))).difference(PageSkips))
@@ -456,9 +453,13 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             #Description of waypoint
             VertAdv = 156 #fix this
             Advance = 0
-            for line in waypoint.wordwrap([DescriptionMaxLength]):
+            lengths = []
+            if waypoint.services is not None:
+                lengths.append(min(txtplot.width - ServicesEdge - ServiceGlyphs.getsize(waypoint.services)[0] - DescriptionEdge,DescriptionMaxLength))
+            lengths.append(DescriptionMaxLength)
+            for line in waypoint.wordwrap(lengths):
                 txtWidth, txtHeight = WayPointFont.getsize(line)
-                if Advance == 0: #terrible way to do this
+                if Advance == 0:
                     EndDesc = DescriptionEdge+txtWidth
                 drawtxt.text((DescriptionEdge,lineX + waypoint.offset-WayPointFont.font.ascent + Advance),line,'black', WayPointFont)
                 Advance += VertAdv
@@ -466,14 +467,16 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             #Elevation
             Elevation = "%.0f" % round(waypoint.elevation)
             txtWidth, txtHeight = WayPointFont.getsize(Elevation)
-            drawtxt.text((TopBuffer + VertPixels + BottomBuffer - ElevationEdge - txtWidth,lineX + waypoint.offset-WayPointFont.font.ascent),Elevation,'black', WayPointFont)
+            drawtxt.text((txtplot.width - ElevationEdge - txtWidth,lineX + waypoint.offset-WayPointFont.font.ascent),Elevation,'black', WayPointFont)
             #print(Elevation)
 
             #Services
             if waypoint.services is not None:
-                txtWidth, txtHeight = WayPointFont.getsize(waypoint.services)
-                BeginService = TopBuffer + VertPixels + BottomBuffer - ServicesEdge - txtWidth
+                txtWidth, txtHeight = ServiceGlyphs.getsize(waypoint.services)
+                BeginService = txtplot.width - ServicesEdge - txtWidth
                 drawtxt.text((BeginService,lineX + waypoint.offset-ServiceGlyphs.font.ascent),waypoint.services,'black', ServiceGlyphs)
+            else:
+                BeginService = txtplot.width - ServicesEdge
 
             #Readability dots
             txtWidth, txtHeight = WayPointFont.getsize(DotLineSymbol)
