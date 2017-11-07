@@ -1,5 +1,5 @@
 #imports
-from geopy.distance import vincenty # integrate into gpxpy?
+from geopy.distance import vincenty
 from PIL import Image, ImageDraw, ImageFont
 import math
 import gpxpy
@@ -8,49 +8,10 @@ import os.path
 
 from poi import POI
 
-##def wordwrap(text, font, lengths):
-##    lines = []
-##    limits = list(lengths)
-##    text = text.strip(' ')
-##    for paragraph in text.split('\n'):
-##        # Run each paragraph separate to preserve line breaks
-##        while font.getsize(paragraph)[0] > limits[0]:
-##            # Remaining text exceeds max, find split point
-##            curspace = -1
-##            nextspace = paragraph.find(' ')
-##            while font.getsize(paragraph[:nextspace])[0] < limits[0]:
-##                # next word still fits on line
-##                curspace = nextspace
-##                nextspace = paragraph.find(' ', nextspace+1)
-##                if nextspace == -1:
-##                    #no spaces left (end occurs on last word)
-##                    break
-##            if curspace == -1:
-##                # current word exceed max by itself
-##                curspace = 0
-##                while font.getsize(paragraph[:curspace])[0] < limits[0]:
-##                    # find the last character that fits
-##                    curspace += 1
-##                lines.append(paragraph[:curspace].strip(' '))
-##                if len(limits) > 1: limits.pop(0)
-##                paragraph = paragraph[curspace:].strip(' ')
-##            else:
-##                # current word is last one that fits
-##                lines.append(paragraph[:curspace].strip(' '))
-##                if len(limits) > 1: limits.pop(0)
-##                paragraph = paragraph[curspace+1:].strip(' ')
-##        if len(paragraph) > 0:
-##            # remaining text is less than max length
-##            lines.append(paragraph)
-##            if len(limits) > 1: limits.pop(0)
-##    return(lines)
-
-
 
 ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
-
 
 
 #GPX File
@@ -493,6 +454,6 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
     del draw
     del drawtxt
-
+    elevplot = elevplot.convert('P')
     elevplot.save(imageFile + str(PageNumber[Page]).zfill(3)+ imageExt, dpi = (DPI, DPI))
 
