@@ -6,35 +6,44 @@ import gpxpy
 import configparser
 import os.path
 
-def wordwrap(text, font, lengths):
-    lines = []
-    limits = list(lengths)
-    text = text.strip(' ')
-    for paragraph in text.split('\n'):
-        while font.getsize(paragraph)[0] > limits[0]:
-            curspace = -1
-            nextspace = paragraph.find(' ')
-            while font.getsize(paragraph[:nextspace])[0] < limits[0]:
-                curspace = nextspace
-                nextspace = paragraph.find(' ', nextspace+1)
-                if nextspace == -1:
-                    #no spaces (end occurs on last word)
-                    break
-            if curspace == -1:
-                curspace = 0
-                while font.getsize(paragraph[:curspace])[0] < limits[0]:
-                    curspace += 1
-                lines.append(paragraph[:curspace].strip(' '))
-                if len(limits) > 1: limits.pop(0)
-                paragraph = paragraph[curspace:].strip(' ')
-            else:
-                lines.append(paragraph[:curspace].strip(' '))
-                if len(limits) > 1: limits.pop(0)
-                paragraph = paragraph[curspace+1:].strip(' ')
-        if len(paragraph) > 0:
-            lines.append(paragraph)
-            if len(limits) > 1: limits.pop(0)
-    return(lines)
+from poi import POI
+
+##def wordwrap(text, font, lengths):
+##    lines = []
+##    limits = list(lengths)
+##    text = text.strip(' ')
+##    for paragraph in text.split('\n'):
+##        # Run each paragraph separate to preserve line breaks
+##        while font.getsize(paragraph)[0] > limits[0]:
+##            # Remaining text exceeds max, find split point
+##            curspace = -1
+##            nextspace = paragraph.find(' ')
+##            while font.getsize(paragraph[:nextspace])[0] < limits[0]:
+##                # next word still fits on line
+##                curspace = nextspace
+##                nextspace = paragraph.find(' ', nextspace+1)
+##                if nextspace == -1:
+##                    #no spaces left (end occurs on last word)
+##                    break
+##            if curspace == -1:
+##                # current word exceed max by itself
+##                curspace = 0
+##                while font.getsize(paragraph[:curspace])[0] < limits[0]:
+##                    # find the last character that fits
+##                    curspace += 1
+##                lines.append(paragraph[:curspace].strip(' '))
+##                if len(limits) > 1: limits.pop(0)
+##                paragraph = paragraph[curspace:].strip(' ')
+##            else:
+##                # current word is last one that fits
+##                lines.append(paragraph[:curspace].strip(' '))
+##                if len(limits) > 1: limits.pop(0)
+##                paragraph = paragraph[curspace+1:].strip(' ')
+##        if len(paragraph) > 0:
+##            # remaining text is less than max length
+##            lines.append(paragraph)
+##            if len(limits) > 1: limits.pop(0)
+##    return(lines)
 
 
 
@@ -200,7 +209,7 @@ MaxElevation = 0
 Waypoints = []
 
 for waypoint in waypointdoc.waypoints:
-    Waypoints.append([waypoint.latitude,waypoint.longitude,waypoint.comment, "", False, int(0)])
+    Waypoints.append([waypoint.latitude,waypoint.longitude,waypoint.comment, waypoint.description, False, int(0)])
 
 
 
@@ -242,7 +251,8 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
         for waypoint in range(len(Waypoints)):
             if  vincenty(CurrentPoint, (Waypoints[waypoint+skipper][0],Waypoints[waypoint+skipper][1])).miles < MaxWaypointDistance:
                 if Waypoints[waypoint+skipper][2] != "":
-                    POIs.append([TotalDistance,CurrentElevation*MeterToFoot,Waypoints[waypoint+skipper][2],Waypoints[waypoint+skipper][3],Waypoints[waypoint+skipper][4],Waypoints[waypoint+skipper][5]])
+                    POIs.append(POI(TotalDistance, CurrentElevation*MeterToFoot,Waypoints[waypoint+skipper][2],WayPointFont, services=Waypoints[waypoint+skipper][3]))
+                    print(Waypoints[waypoint+skipper][3])
                 else:
                     print("Empty Waypoint:")
                     print(Waypoint[waypoint+skipper])
@@ -254,10 +264,6 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
         PreviousElevation = float(point.elevation)
         MinElevation = MaxElevation = PreviousElevation
         FirstPass = False
-
-
-
-
 
 POIs.sort()
 
@@ -409,62 +415,65 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
 
     #Calculate Offsets
     #Dumb implementation right now, no end bounds, no recursive checking
-
+    #Linespace?
     FirstPOI = True
     EndBoundPass = False
     for index in range(len(POIs)-1):
         #check if first entry
-        if FirstPOI and int(POIs[index][0]/Pagination) == Page:
+        if FirstPOI and int(POIs[index].distance/Pagination) == Page:
             FirstPOI = False
-            if int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels) - max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) < 0:
-                POIs[index][5] = max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) - int(((POIs[index][0] - Page*Pagination)/Pagination)*HorPixels)
-        if int(POIs[index+1][0]/Pagination) == Page and \
-           int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace > int((POIs[index+1][0]/Pagination)*HorPixels):
-            POIs[index+1][5] =  int((POIs[index][0]/Pagination)*HorPixels) + POIs[index][5] + LineSpace - int((POIs[index+1][0]/Pagination)*HorPixels)
+            if int(((POIs[index].distance - Page*Pagination)/Pagination)*HorPixels) - max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) < 0:
+                POIs[index].offset = max(WayPointFont.font.ascent,WayPointFontBold.font.ascent,ServiceGlyphs.font.ascent) - int(((POIs[index].distance - Page*Pagination)/Pagination)*HorPixels)
+        if int(POIs[index+1].distance/Pagination) == Page and \
+           int((POIs[index].distance/Pagination)*HorPixels) + POIs[index].offset + POIs[index].getheight([DescriptionMaxLength]) > int((POIs[index+1].distance/Pagination)*HorPixels):
+            POIs[index+1].offset =  int((POIs[index].distance/Pagination)*HorPixels) + POIs[index].offset + POIs[index].getheight([DescriptionMaxLength]) - int((POIs[index+1].distance/Pagination)*HorPixels)
        #check bottom (only on last one needed)
-
+    
 
     #Render
     for waypoint in POIs:
-        if int(waypoint[0]/Pagination) == Page:
-            print()
-            for txtline in wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength]):
-                print(txtline)
-            lineX = LeftBuffer + int(((waypoint[0] - Page*Pagination)/Pagination)*HorPixels)
-            draw.line([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+ MarkerLength,\
-                       lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])],\
+        if int(waypoint.distance/Pagination) == Page:
+            lineX = LeftBuffer + int(((waypoint.distance - Page*Pagination)/Pagination)*HorPixels)
+            draw.line([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint.elevation)+ MarkerLength,\
+                       lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint.elevation)],\
                       ElevationColor, MarkerWeight)
-            if waypoint[4]: #Special Triangle Marker
-                draw.polygon([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+ MarkerLength - MarkerWeight,\
-                          lineX-int(TriangleMarkerSize/2),TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+TriangleMarkerSize + MarkerLength - MarkerWeight,\
-                          lineX+int(TriangleMarkerSize/2),TopBuffer+VertPixels-int(PixelPerElev*waypoint[1])+TriangleMarkerSize + MarkerLength - MarkerWeight],\
+            if waypoint.marker is not None: #Special Triangle Marker
+                draw.polygon([lineX,TopBuffer+VertPixels-int(PixelPerElev*waypoint.elevation)+ MarkerLength - MarkerWeight,\
+                          lineX-int(TriangleMarkerSize/2),TopBuffer+VertPixels-int(PixelPerElev*waypoint.elevation)+TriangleMarkerSize + MarkerLength - MarkerWeight,\
+                          lineX+int(TriangleMarkerSize/2),TopBuffer+VertPixels-int(PixelPerElev*waypoint.elevation)+TriangleMarkerSize + MarkerLength - MarkerWeight],\
                          ElevationColor)
 
             #Distance to end (SOBO on a NOBO guide)
-            DTE = "%.1f" % (TotalDistance - waypoint[0])
+            DTE = "%.1f" % (TotalDistance - waypoint.distance)
             txtWidth, txtHeight = WayPointFont.getsize(DTE)
-            drawtxt.text((dteEdge-txtWidth,lineX + waypoint[5]-WayPointFont.font.ascent),DTE,'black', WayPointFont)
+            drawtxt.text((dteEdge-txtWidth,lineX + waypoint.offset-WayPointFont.font.ascent),DTE,'black', WayPointFont)
 
             #Distance to start (NOBO on a NOBO guide)
-            DTS = "%.1f" % waypoint[0]
+            DTS = "%.1f" % waypoint.distance
             txtWidth, txtHeight = WayPointFontBold.getsize(DTS)
-            drawtxt.text((dtsEdge-txtWidth,lineX + waypoint[5]-WayPointFontBold.font.ascent),DTS,'black', WayPointFontBold)
+            drawtxt.text((dtsEdge-txtWidth,lineX + waypoint.offset-WayPointFontBold.font.ascent),DTS,'black', WayPointFontBold)
 
             #Description of waypoint
-            txtWidth, txtHeight = WayPointFont.getsize(wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength])[0])
-            EndDesc = DescriptionEdge+txtWidth
-            drawtxt.text((DescriptionEdge,lineX + waypoint[5]-WayPointFont.font.ascent),wordwrap(waypoint[2], WayPointFont, [DescriptionMaxLength])[0],'black', WayPointFont)
+            VertAdv = 156 #fix this
+            Advance = 0
+            for line in waypoint.wordwrap([DescriptionMaxLength]):
+                txtWidth, txtHeight = WayPointFont.getsize(line)
+                if Advance == 0: #terrible way to do this
+                    EndDesc = DescriptionEdge+txtWidth
+                drawtxt.text((DescriptionEdge,lineX + waypoint.offset-WayPointFont.font.ascent + Advance),line,'black', WayPointFont)
+                Advance += VertAdv
 
             #Elevation
-            Elevation = "%.0f" % round(waypoint[1])
+            Elevation = "%.0f" % round(waypoint.elevation)
             txtWidth, txtHeight = WayPointFont.getsize(Elevation)
-            drawtxt.text((TopBuffer + VertPixels + BottomBuffer - ElevationEdge - txtWidth,lineX + waypoint[5]-WayPointFont.font.ascent),Elevation,'black', WayPointFont)
+            drawtxt.text((TopBuffer + VertPixels + BottomBuffer - ElevationEdge - txtWidth,lineX + waypoint.offset-WayPointFont.font.ascent),Elevation,'black', WayPointFont)
             #print(Elevation)
 
             #Services
-            txtWidth, txtHeight = WayPointFont.getsize(waypoint[3])
-            BeginService = TopBuffer + VertPixels + BottomBuffer - ServicesEdge - txtWidth
-            drawtxt.text((BeginService,lineX + waypoint[5]-ServiceGlyphs.font.ascent),waypoint[3],'black', ServiceGlyphs)
+            if waypoint.services is not None:
+                txtWidth, txtHeight = WayPointFont.getsize(waypoint.services)
+                BeginService = TopBuffer + VertPixels + BottomBuffer - ServicesEdge - txtWidth
+                drawtxt.text((BeginService,lineX + waypoint.offset-ServiceGlyphs.font.ascent),waypoint.services,'black', ServiceGlyphs)
 
             #Readability dots
             txtWidth, txtHeight = WayPointFont.getsize(DotLineSymbol)
@@ -472,7 +481,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
                 EndDesc = EndDesc + PixelsPerDotLine - EndDesc % PixelsPerDotLine
             assert (EndDesc % PixelsPerDotLine) == 0
             for dot in range(0,BeginService - EndDesc - txtWidth,PixelsPerDotLine):
-                    drawtxt.text((EndDesc + dot,lineX + waypoint[5]-WayPointFont.font.ascent),DotLineSymbol,'black', WayPointFont)
+                    drawtxt.text((EndDesc + dot,lineX + waypoint.offset-WayPointFont.font.ascent),waypoint.fill,'black', WayPointFont)
 
 
     #Rotate and merge text
