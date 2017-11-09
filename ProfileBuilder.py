@@ -71,10 +71,10 @@ PageNumberBoxBottom = int(Config.getfloat("PageNumber","Bottom")*DPI)
 PageNumberBoxRight = int(Config.getfloat("PageNumber","Right")*DPI)
 PageNumberBoxColor = Config.get("PageNumber","Color")
 PageNumberOffset = int(Config.getfloat("PageNumber","NumberBaseline")*DPI)
-PageSkips = []
+PageSkips = set()
 for Page in Config.get("PageNumber","PageSkips").split(','):
     if len(Page) > 0:
-        PageSkips.append(int(Page))
+        PageSkips.add(int(Page))
 
 
 #Rendering Variables
@@ -106,11 +106,16 @@ RightLine = int(Config.getfloat("SideLines","RightHoriz")*DPI)
 
 
 #Fonts
-WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
-WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
-PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"), int(Config.getfloat("Fonts","PageNumberHeight")*DPI))
-ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"), int(Config.getfloat("Fonts","WaypointHeight")*DPI))
-ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"), int(Config.getfloat("Fonts","ElevationAxisHeight")*DPI))
+WayPointFont = ImageFont.truetype(Config.get("Fonts","WaypointFont"),
+                                  int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+WayPointFontBold = ImageFont.truetype(Config.get("Fonts","WaypointFontBold"),
+                                      int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+PageNumberFont = ImageFont.truetype(Config.get("Fonts","PageNumberFont"),
+                                    int(Config.getfloat("Fonts","PageNumberHeight")*DPI))
+ServiceGlyphs = ImageFont.truetype(Config.get("Fonts","WaypointGlyphs"),
+                                   int(Config.getfloat("Fonts","WaypointHeight")*DPI))
+ElevationAxisFont = ImageFont.truetype(Config.get("Fonts","ElevationAxisFont"),
+                                       int(Config.getfloat("Fonts","ElevationAxisHeight")*DPI))
 
 ElevationAxisBuffer = int(Config.getfloat("ElevationIntervals","Buffer")*DPI)
 ElevationAxisCenteringScalar = Config.getfloat("ElevationIntervals","LabelOffsetScalar")
@@ -244,14 +249,6 @@ if autoMinElev or autoMaxElev:
     print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
     ElevationInterval = int((maxElev-minElev)/5)
 
-    
-##if autoMaxElev:
-##    ElevationInterval = int((MaxElevation-MinElevation)*MeterToFoot/5)
-##    minElev = int(MinElevation*MeterToFoot) - int(MinElevation*MeterToFoot)%ElevationInterval
-##    print(minElev)
-##    maxElev = int(MaxElevation*MeterToFoot)
-##    print(maxElev)
-
 if autoAdjustPagination:
     Pagination = TotalDistance/max(1,round(TotalDistance/Pagination))
     print("Distance per page (miles): " + str(Pagination))
@@ -260,44 +257,51 @@ if len(Waypoints) > 0:
     print("Warning: Unmatched waypoints-")
     print(Waypoints)
 
-print("Generating " + str(math.ceil(TotalDistance/Pagination)) + " pages")
+NumPages = math.ceil(TotalDistance/Pagination)
+print("Generating " + str(NumPages) + " pages")
 
-PageNumber = list(set(range(1,math.ceil(TotalDistance/Pagination)+1+len(PageSkips))).difference(PageSkips))
+PageNumber = list(set(range(1, NumPages + 1 + len(PageSkips))).difference(PageSkips))
 
 
 for Page in range(math.ceil(TotalDistance/Pagination)):
     print("Rendering Page: ", Page + 1, sep='')
-    elevplot = Image.new('RGB', (LeftBuffer + RightBuffer + HorPixels, BottomBuffer + TopBuffer + VertPixels), BackgroundColor)
-    txtplot = Image.new('RGBA', (BottomBuffer + TopBuffer + VertPixels, LeftBuffer + RightBuffer + HorPixels), (0,0,0,0))
+    pagewidth = LeftBuffer + RightBuffer + HorPixels
+    pageheight = BottomBuffer + TopBuffer + VertPixels
+    elevplot = Image.new('RGB', (pagewidth, pageheight), BackgroundColor)
+    txtplot = Image.new('RGBA', (pageheight, pagewidth), (0,0,0,0))
     draw = ImageDraw.Draw(elevplot)
     drawtxt = ImageDraw.Draw(txtplot)
 
     if oddSwap and PageNumber[Page] %2 != 0:
         #Page Number Box
-        draw.rectangle([elevplot.size[0] - PageNumberBoxRight, elevplot.size[1] - PageNumberBoxBottom - PageNumberBoxHeight,\
-                        elevplot.size[0] - PageNumberBoxRight + PageNumberBoxWidth, elevplot.size[1] - PageNumberBoxBottom], PageNumberBoxColor)
+        boxside = pagewidth - PageNumberBoxRight
+        boxbottom = pageheight - PageNumberBoxBottom
+        draw.rectangle([boxside, boxbottom - PageNumberBoxHeight,
+                       boxside + PageNumberBoxWidth, boxbottom],
+                       PageNumberBoxColor)
 
         #PageNumber[Page]   YAxisLabelEdge-ElevationAxisFont.font.ascent
         txtWidth, txtHeight = PageNumberFont.getsize(str(PageNumber[Page]))
-        draw.text((int(elevplot.size[0] - PageNumberBoxRight + PageNumberBoxWidth/2.0 - txtWidth/2), \
-                   elevplot.size[1] - PageNumberBoxBottom - PageNumberBoxHeight + PageNumberOffset - PageNumberFont.font.ascent),\
-                  str(PageNumber[Page]),'white', PageNumberFont)
+        draw.text((int(boxside + PageNumberBoxWidth/2.0 - txtWidth/2), boxbottom - PageNumberBoxHeight + PageNumberOffset - PageNumberFont.font.ascent), str(PageNumber[Page]),'white', PageNumberFont)
 
         #LeftBorder
-        draw.line([elevplot.size[0] - LeftLine, TopLeftLine, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomLeftLine], LeftBorderColor, LeftBorderWeight)
+        draw.line([pagewidth - LeftLine, TopLeftLine, elevplot.size[0] - LeftLine, elevplot.size[1] - BottomLeftLine],
+                  LeftBorderColor, LeftBorderWeight)
 
         #RightBorder
-        draw.line([RightLine, TopBuffer+VertPixels / float(maxElev - minElev)*((maxElev-minElev)%ElevationInterval), RightLine, TopBuffer+VertPixels], RightBorderColor, RightBorderWeight)
+        elevdelta = float(maxElev - minElev)
+        plotbottom = TopBuffer + VertPixels
+        draw.line([RightLine, plotbottom / elevdelta * (elevdelta%ElevationInterval), RightLine, plotbottom], RightBorderColor, RightBorderWeight)
 
         #Elevation intervals
         PixelPerElev = VertPixels / float(maxElev - minElev)
         for elevation in range(minElev, maxElev, ElevationInterval):
-            ElevPixel = TopBuffer+VertPixels-int(PixelPerElev*elevation)
-            #print([LeftLine, ElevPixel, RightLine, ElevPixel])
-            draw.line([RightLine, ElevPixel, elevplot.size[0] - LeftBuffer, ElevPixel], ElevationIntervalColor, ElevationIntervalWeight)
+            ElevPixel = plotbottom - int(PixelPerElev*elevation)
+            draw.line([RightLine, ElevPixel, pagewidth - LeftBuffer, ElevPixel],
+                      ElevationIntervalColor, ElevationIntervalWeight)
             txtWidth, txtHeight = ElevationAxisFont.getsize(str(int(elevation)))
             if not skipzero or abs(elevation) > 0.1: #Add elevation axis labels if non-zero or zero label flag set
-                draw.text((elevplot.size[0] - LeftLine + ElevationAxisBuffer, int(ElevPixel-txtHeight*ElevationAxisCenteringScalar)), str(int(elevation)),'black',ElevationAxisFont)
+                draw.text((pagewidth - LeftLine + ElevationAxisBuffer, int(ElevPixel-txtHeight*ElevationAxisCenteringScalar)), str(int(elevation)),'black',ElevationAxisFont)
 
 
     else:
