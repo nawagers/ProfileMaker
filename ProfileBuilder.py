@@ -326,7 +326,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             elevPlot.append(CurrentPoint)
             PreviousPoint = CurrentPoint
 
-    draw.line(elevPlot,ElevationColor, ElevationWeight)
+    draw.line(elevPlot, ElevationColor, ElevationWeight)
     for joint in elevPlot[1:-1]:
         draw.ellipse((joint[0]-ElevationWeight/2, joint[1]-ElevationWeight/2, joint[0]+ElevationWeight/2, joint[1]+ElevationWeight/2), ElevationColor)
 
