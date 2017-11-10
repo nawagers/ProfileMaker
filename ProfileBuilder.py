@@ -8,7 +8,7 @@ import os.path
 
 from poi import POI
 
-
+#added a comment
 ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
