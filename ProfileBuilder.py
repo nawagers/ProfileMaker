@@ -3,6 +3,7 @@ from geopy.distance import vincenty
 from PIL import Image, ImageDraw, ImageFont
 import math
 import gpxpy
+import srtm
 import configparser
 import os.path
 
@@ -82,6 +83,7 @@ autoElevInt = Config.getboolean("ElevationIntervals", "autoInt")
 autoAdjustPagination = Config.getboolean("Profile", "autoFitMiles")
 Pagination = Config.getfloat("Profile", "MilesPerPage")
 oddSwap = Config.getboolean("PageLayout", "MirrorPages")
+usesatDEM = Config.getboolean("Profile", "UseSatDEM")
 
 # Lines
 BackgroundColor = Config.get("PlotArea", "Color")
@@ -176,12 +178,16 @@ print("Processing " + str(len(Waypoints)) + " waypoints")
 foundtenth= 5.0
 prevElevation = 0
 
-# Implement better by getting SRTM data and smoothly integrating 
-for point in gpsdoc.tracks[TrackNumber].segments[0].points:
-    if point.elevation is None:
-        point.elevation = prevElevation
-    else:
-        prevElevation = point.elevation
+
+if usesatDEM:
+    elevation_data = srtm.get_data()
+    elevation_data.add_elevations(gpsdoc)
+else:
+    for point in gpsdoc.tracks[TrackNumber].segments[0].points:
+        if point.elevation is None:
+            point.elevation = prevElevation
+        else:
+            prevElevation = point.elevation
 
 mu = 0
 for point in gpsdoc.tracks[TrackNumber].segments[0].points:
