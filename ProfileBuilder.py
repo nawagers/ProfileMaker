@@ -7,8 +7,8 @@ import configparser
 import os.path
 
 from poi import POI
+from utils import fastdist
 
-#added a comment
 ConfigFileName = os.path.abspath("TestData/NET.ini")
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
@@ -134,8 +134,10 @@ PixelsPerDotLine = int(Config.getfloat("Profile", "FillSpacing")*DPI)
 DotLineSymbol = Config.get("Profile", "FillSymbol")
 
 # Constants
-MeterToFoot = 3.28084
-MaxWaypointDistance = Config.getfloat("Profile", "WaypointDistance")/5280
+FEETPERMETER = 3.28084
+FEETPERDEGREE = 363998
+MaxWaypointDistance = (Config.getfloat("Profile", "WaypointDistance")
+                       / FEETPERDEGREE) ** 2
 
 print("Parsing Waypoint file")
 waypoints_file = open(WaypointFile, 'r')
@@ -181,30 +183,38 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
     else:
         prevElevation = point.elevation
 
+mu = 0
 for point in gpsdoc.tracks[TrackNumber].segments[0].points:
     if not FirstPass:
         CurrentPoint = (float(point.latitude), float(point.longitude))
         CurrentElevation = float(point.elevation)
-        TotalDistance += vincenty(PreviousPoint, CurrentPoint).miles
+        segmentlength = vincenty(PreviousPoint, CurrentPoint).miles
+        TotalDistance += segmentlength
         if TotalDistance > foundtenth:
             foundtenth += 5
-            print("Processed " + str("%.2f" % TotalDistance)+ " miles with " + str(len(Waypoints)) + " waypoints left")
-        if  vincenty(PreviousPoint, CurrentPoint).miles > 0.0378788:
-            print("Warning: Gap detected at " + str("%.2f" % TotalDistance) + " of " + str(int(5280 * vincenty(PreviousPoint, CurrentPoint).miles)) + " feet")
+            print("Processed " + str("%.2f" % TotalDistance)+ " miles with "
+                  + str(len(Waypoints)) + " waypoints left")
+        if  segmentlength > 0.0378788:
+            print("Warning: Gap detected at " + str("%.2f" % TotalDistance)
+                  + " of " + str(int(5280 * segmentlength)) + " feet")
         if CurrentElevation > PreviousElevation:
             TotalElevationGain += CurrentElevation - PreviousElevation
         MaxElevation = max(MaxElevation, CurrentElevation)
         MinElevation = min(MinElevation, CurrentElevation)
         PreviousPoint = CurrentPoint
         PreviousElevation = CurrentElevation
-        elevations.append((TotalDistance, CurrentElevation*MeterToFoot, CurrentPoint))
+        elevations.append((TotalDistance, CurrentElevation*FEETPERMETER,
+                           CurrentPoint))
 
         # Match Waypoints, poor implementation, first point < MaxWaypointDistance
         skipper = int(0)
         for waypoint in range(len(Waypoints)):
-            if  vincenty(CurrentPoint, (Waypoints[waypoint+skipper][0],Waypoints[waypoint+skipper][1])).miles < MaxWaypointDistance:
+            if (fastdist(point.latitude, point.longitude,
+                        Waypoints[waypoint+skipper][0],
+                        Waypoints[waypoint+skipper][1], mu)
+                < MaxWaypointDistance): 
                 if Waypoints[waypoint+skipper][2] != "":
-                    POIs.append(POI(TotalDistance, CurrentElevation*MeterToFoot,Waypoints[waypoint+skipper][2],WayPointFont, services=Waypoints[waypoint+skipper][3]))
+                    POIs.append(POI(TotalDistance, CurrentElevation*FEETPERMETER,Waypoints[waypoint+skipper][2],WayPointFont, services=Waypoints[waypoint+skipper][3]))
                 else:
                     print("Empty Waypoint:")
                     print(Waypoint[waypoint+skipper])
@@ -216,22 +226,23 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
         PreviousElevation = float(point.elevation)
         MinElevation = MaxElevation = PreviousElevation
         FirstPass = False
+        mu = math.cos(math.radians(point.latitude))
 
 POIs.sort()
 
 print()
-print("Minimum Elevation: " + str(MinElevation*MeterToFoot))
-print("Maximum Elevation: " + str(MaxElevation*MeterToFoot))
+print("Minimum Elevation: " + str(MinElevation*FEETPERMETER))
+print("Maximum Elevation: " + str(MaxElevation*FEETPERMETER))
 
 
 
 if autoMaxElev:
-    print("Adjusting maximum elevation to " + str(MaxElevation*MeterToFoot))
-    maxElev = int(MaxElevation*MeterToFoot)
+    print("Adjusting maximum elevation to " + str(MaxElevation*FEETPERMETER))
+    maxElev = int(MaxElevation*FEETPERMETER)
     
 if autoMinElev:
-    print("Adjusting minimum elevation to " + str(MinElevation*MeterToFoot))
-    minElev = int(MinElevation*MeterToFoot)
+    print("Adjusting minimum elevation to " + str(MinElevation*FEETPERMETER))
+    minElev = int(MinElevation*FEETPERMETER)
     
 if autoMinElev or autoMaxElev:
     print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
