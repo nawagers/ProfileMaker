@@ -1,4 +1,4 @@
-Guidebook/Guide001.png
 *.pyc
 *.png
 *.pyc
+!RefSample*
