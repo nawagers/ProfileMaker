@@ -10,6 +10,7 @@ import logging
 import os.path
 
 from poi import POI
+from page import page
 from utils import fastdist, maxloglevel
 
 # Create new logging instance
