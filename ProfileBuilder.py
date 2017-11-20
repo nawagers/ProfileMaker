@@ -1,38 +1,60 @@
 # imports
+import sys
 from geopy.distance import vincenty
 from PIL import Image, ImageDraw, ImageFont
 import math
 import gpxpy
 import srtm
 import configparser
+import logging
 import os.path
 
 from poi import POI
-from utils import fastdist
+from utils import fastdist, maxloglevel
 
+# Create new logging instance
+log = logging.getLogger()
+log.setLevel(logging.INFO)
+
+# Set console out handler for logging
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.INFO)
+stdout_handler.addFilter(maxloglevel(logging.INFO))
+log.addHandler(stdout_handler)
+
+# Set console error handler for logging
+stderr_handler = logging.StreamHandler(sys.stderr)
+stderr_handler.setLevel(logging.WARNING)
+log.addHandler(stderr_handler)
+
+# Load config file
 ConfigFileName = os.path.abspath("TestData/NET.ini")
+ConfigDir = os.path.dirname(ConfigFileName)
 Config = configparser.ConfigParser()
 Config.read(ConfigFileName)
 
+# Set file handler for logging
+logfile = os.path.splitext(ConfigFileName)[0] + ".log"
+log.addHandler(logging.FileHandler(logfile, mode='w'))
 
-# GPX File
+# Load GPX Files
 TrackFile = Config.get("InputFiles", "TrackFile")
 if not os.path.isabs(TrackFile):
-    TrackFile = os.path.join(os.path.dirname(ConfigFileName), TrackFile)
+    TrackFile = os.path.join(ConfigDir, TrackFile)
 TrackFile = os.path.normpath(TrackFile)
 
 if not os.path.isfile(TrackFile):
-    print("Track File does not exists: ", TrackFile)
+    log.info("Track File does not exists: ", TrackFile)
     raise FileNotFoundError
 
 WaypointFile = Config.get("InputFiles", "WaypointFile")
 if len(WaypointFile) == 0:
     WaypointFile = TrackFile
 elif not os.path.isabs(WaypointFile):
-    WaypointFile = os.path.join(os.path.dirname(ConfigFileName), WaypointFile)
+    WaypointFile = os.path.join(ConfigDir, WaypointFile)
 WaypointFile = os.path.normpath(WaypointFile)
 if not os.path.isfile(WaypointFile):
-    print("Waypoint File does not exists: ", WaypointFile)
+    log.info("Waypoint File does not exists: ", WaypointFile)
     raise FileNotFoundError
 
 TrackNumber = int(Config.get("InputFiles", "TrackNumber"))
@@ -42,7 +64,7 @@ OutputDir = Config.get("OutputFiles", "OutputDir")
 if not os.path.isabs(OutputDir):
     OutputDir = os.path.join(os.path.dirname(ConfigFileName), OutputDir)
 if not os.path.isdir(OutputDir):
-    print("Error: " + OutputDir + " is not a directory")
+    log.info("Error: " + OutputDir + " is not a directory")
     raise NotADirectoryError
 imageFile = os.path.join(OutputDir, Config.get("OutputFiles", "OutputBase"))
 imageFile = os.path.normpath(imageFile)
@@ -141,19 +163,19 @@ FEETPERDEGREE = 363998
 MaxWaypointDistance = (Config.getfloat("Profile", "WaypointDistance")
                        / FEETPERDEGREE) ** 2
 
-print("Parsing Waypoint file")
+log.info("Parsing Waypoint file")
 waypoints_file = open(WaypointFile, 'r')
 waypointdoc = gpxpy.parse(waypoints_file)
 waypoints_file.close()
-print("Done parsing waypoints")
+log.info("Done parsing waypoints")
 
-print("Parsing Track file")
+log.info("Parsing Track file")
 gps_file = open(TrackFile, 'r')
 gpsdoc = gpxpy.parse(gps_file)
 gps_file.close()
-print("Done parsing track")
+log.info("Done parsing track")
 if TrackNumber > len(gpsdoc.tracks) - 1:
-    print("Error, Track number not found in track file: ", TrackNumber)
+    log.error("Error, Track number not found in track file: ", TrackNumber)
     raise IndexError
 
 PreviousPoint = (0.0, 0.0)
@@ -173,8 +195,8 @@ for waypoint in waypointdoc.waypoints:
     Waypoints.append([waypoint.latitude,waypoint.longitude, waypoint.comment, waypoint.description, False, int(0)])
 
 POIs = []
-print()
-print("Processing " + str(len(Waypoints)) + " waypoints")
+log.info("")
+log.info("Processing {} waypoints".format(len(Waypoints)))
 foundtenth= 5.0
 prevElevation = 0
 
@@ -198,11 +220,11 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
         TotalDistance += segmentlength
         if TotalDistance > foundtenth:
             foundtenth += 5
-            print("Processed " + str("%.2f" % TotalDistance)+ " miles with "
-                  + str(len(Waypoints)) + " waypoints left")
+            log.info("Processed {:.2f} miles with {} waypoints "
+                     "left".format(TotalDistance, len(Waypoints)))
         if  segmentlength > 0.0378788:
-            print("Warning: Gap detected at " + str("%.2f" % TotalDistance)
-                  + " of " + str(int(5280 * segmentlength)) + " feet")
+            log.warning("Warning: Gap detected at {:.2f} of {} "
+                        "feet".format(TotalDistance,int(5280 * segmentlength)))
         if CurrentElevation > PreviousElevation:
             TotalElevationGain += CurrentElevation - PreviousElevation
         MaxElevation = max(MaxElevation, CurrentElevation)
@@ -220,10 +242,14 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
                         Waypoints[waypoint+skipper][1], mu)
                 < MaxWaypointDistance): 
                 if Waypoints[waypoint+skipper][2] != "":
-                    POIs.append(POI(TotalDistance, CurrentElevation*FEETPERMETER,Waypoints[waypoint+skipper][2],WayPointFont, services=Waypoints[waypoint+skipper][3]))
+                    POIs.append(POI(TotalDistance,
+                                    CurrentElevation*FEETPERMETER,
+                                    Waypoints[waypoint+skipper][2],
+                                    WayPointFont,
+                                    services=Waypoints[waypoint+skipper][3]))
                 else:
-                    print("Empty Waypoint:")
-                    print(Waypoint[waypoint+skipper])
+                    log.warning("Empty Waypoint:")
+                    log.warning(Waypoint[waypoint+skipper])
                 del Waypoints[waypoint+skipper]
                 skipper -= 1
         
@@ -236,40 +262,43 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
 
 POIs.sort()
 
-print()
-print("Minimum Elevation: " + str(MinElevation*FEETPERMETER))
-print("Maximum Elevation: " + str(MaxElevation*FEETPERMETER))
+log.info("")
+log.info("Minimum Elevation: {:.2f} feet".format(MinElevation*FEETPERMETER))
+log.info("Maximum Elevation: {:.2f} feet".format(MaxElevation*FEETPERMETER))
 
 
 
 if autoMaxElev:
-    print("Adjusting maximum elevation to " + str(MaxElevation*FEETPERMETER))
+    log.info("Adjusting maximum elevation to {:.2f} "
+             "feet".format(MaxElevation*FEETPERMETER))
     maxElev = int(MaxElevation*FEETPERMETER)
     
 if autoMinElev:
-    print("Adjusting minimum elevation to " + str(MinElevation*FEETPERMETER))
+    log.info("Adjusting minimum elevation to {:.2f} "
+             "feet".format(MinElevation*FEETPERMETER))
     minElev = int(MinElevation*FEETPERMETER)
     
 if autoMinElev or autoMaxElev:
-    print("Adjusting elevation interval to " + str(int((maxElev-minElev)/5)))
+    log.info("Adjusting elevation interval to {}".format(int((maxElev-minElev)/5)))
     ElevationInterval = int((maxElev-minElev)/5)
 
 if autoAdjustPagination:
     Pagination = TotalDistance/max(1,round(TotalDistance/Pagination))
-    print("Distance per page (miles): " + str(Pagination))
+    log.info("Distance per page: {:.2f} miles".format(Pagination))
 
 if len(Waypoints) > 0:
-    print("Warning: Unmatched waypoints-")
-    print(Waypoints)
+    log.warning("Warning: Unmatched waypoints:")
+    for point in Waypoints:
+        log.warning(point)
 
 NumPages = math.ceil(TotalDistance/Pagination)
-print("Generating " + str(NumPages) + " pages")
+log.info("Generating {} pages".format(NumPages))
 
 PageNumber = list(set(range(1, NumPages + 1 + len(PageSkips))).difference(PageSkips))
 
 
 for Page in range(math.ceil(TotalDistance/Pagination)):
-    print("Rendering Page: ", Page + 1, sep='')
+    log.info("Rendering Page: {}".format(Page + 1))
     pagewidth = LeftBuffer + RightBuffer + HorPixels
     pageheight = BottomBuffer + TopBuffer + VertPixels
     elevplot = Image.new('RGB', (pagewidth, pageheight), BackgroundColor)

@@ -1,15 +1,20 @@
 """
-Provide funtion various functions.
+Provide various functions and helper classes.
 
+Classes:
+    maxloglevel: Filters out log messages above a set level
 Functions:
     fastdist: Quickly calculates distance between two GPS coordinates
+
 """
 
 import math
+import logging
+
 
 def fastdist(lat1, lon1, lat2, lon2, mu):
     """
-    Approximate the distance between two points
+    Approximate the distance between two points.
 
     Calculates the 2D Euclidean distance between two points using a planar
     projection from a spherical earth model. When both points lie between 25
@@ -52,5 +57,55 @@ def fastdist(lat1, lon1, lat2, lon2, mu):
         A float containing distance in equatorial degrees squared
 
     """
-
     return (lat1 - lat2) ** 2 + ((mu * (lon1 - lon2)) ** 2)
+
+
+class maxloglevel(logging.Filter):
+    """
+    Filter the log handler to set a maximum log level.
+
+    Inherit from logging.Filter. Set the maximum log level captured by
+    the handler to remove higher levels.
+
+    Methods:
+        __init__: Extend super.__init__ to create new instance
+        filter: Extend super.filter to remove log levels higher than
+            maximum
+
+    """
+
+    def __init__(self, maximum, name=""):
+        """
+        Create new instance of maxloglevel.
+
+        Args:
+            maximum: logging level not to exceed
+            name: str of logging channel to apply the filter. If name is
+                "" then the filter applies to all channels.
+        """
+        super(maxloglevel, self).__init__(name)
+        self.max_level = maximum
+
+    def filter(self, record):
+        """
+        Suppress records when the level is too high or wrong channel.
+
+        Extends Filter.filter to additionally suppress log messages which
+        exceed the maximum level. For example if the filter maximum is
+        logging.INFO and the record.levelno is logging.WARNING the filter
+        will return 0 causing the Logger instance to ignore it. The name
+        filtering of Filter.filter is preserved. If the filter is set to
+        accept "A" it will pass when record.name is "A" or "A.*", where *
+        is any number of "." separated substrings.
+
+        Args:
+            record: LogRecord instance to be filtered
+
+        Returns:
+            zero if record should be suppressed, non-zero otherwise
+
+        """
+        if record.levelno <= self.max_level:
+            return super(maxloglevel, self).filter(record)
+        else:
+            return 0

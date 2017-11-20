@@ -2,3 +2,4 @@
 *.png
 *.pyc
 !RefSample*
+*.log
