@@ -360,7 +360,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
             txtWidth, txtHeight = ElevationAxisFont.getsize(str(int(elevation)))
             if not skipzero or abs(elevation) > 0.1: # Add elevation axis labels if non-zero or zero label flag set
                 draw.text((LeftLine-txtWidth-ElevationAxisBuffer, int(ElevPixel-txtHeight*ElevationAxisCenteringScalar)), str(int(elevation)),'black',ElevationAxisFont)
-            
+    
     PreviousPoint = (0,0)
     elevPlot = []
     for trackpoint in elevations:
@@ -411,7 +411,7 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
            int((POIs[index].distance/Pagination)*HorPixels) + POIs[index].offset + POIs[index].getheight([DescriptionMaxLength]) > int((POIs[index+1].distance/Pagination)*HorPixels):
             POIs[index+1].offset =  int((POIs[index].distance/Pagination)*HorPixels) + POIs[index].offset + POIs[index].getheight([DescriptionMaxLength]) - int((POIs[index+1].distance/Pagination)*HorPixels)
        # check bottom (only on last one needed)
-    
+
     # Render
     for waypoint in POIs:
         if int(waypoint.distance/Pagination) == Page:
@@ -468,11 +468,10 @@ for Page in range(math.ceil(TotalDistance/Pagination)):
                     drawtxt.text((EndDesc + dot, lineX + waypoint.offset - WayPointFont.font.ascent), waypoint.fill, 'black', WayPointFont)
 
     # Rotate and merge text
-    txtplot = txtplot.rotate(90, "1", True)
+    txtplot = txtplot.transpose(Image.ROTATE_90)
     elevplot.paste(txtplot, None, txtplot)
-
     del draw
     del drawtxt
-    elevplot = elevplot.convert('P')
+    elevplot = elevplot.convert('P', dither=Image.NONE, palette="ADAPTIVE")
     elevplot.save(imageFile + str(PageNumber[Page]).zfill(3) + imageExt,
                   dpi=(DPI, DPI))
