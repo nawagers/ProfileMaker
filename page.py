@@ -4,7 +4,7 @@ import logging
 from PIL import Image, ImageDraw, ImageFont
 
 
-class page:
+class Page:
     """
     Summary.
 

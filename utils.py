@@ -59,7 +59,7 @@ def fastdist(lat1, lon1, lat2, lon2, mu):
     return (lat1 - lat2) ** 2 + ((mu * (lon1 - lon2)) ** 2)
 
 
-class maxloglevel(logging.Filter):
+class MaxLogLevel(logging.Filter):
     """
     Filter the log handler to set a maximum log level.
 
@@ -75,14 +75,14 @@ class maxloglevel(logging.Filter):
 
     def __init__(self, maximum, name=""):
         """
-        Create new instance of maxloglevel.
+        Create new instance of MaxLogLevel.
 
         Args:
             maximum: logging level not to exceed
             name: str of logging channel to apply the filter. If name is
                 "" then the filter applies to all channels.
         """
-        super(maxloglevel, self).__init__(name)
+        super(MaxLogLevel, self).__init__(name)
         self.max_level = maximum
 
     def filter(self, record):
@@ -105,6 +105,5 @@ class maxloglevel(logging.Filter):
 
         """
         if record.levelno <= self.max_level:
-            return super(maxloglevel, self).filter(record)
-        else:
-            return 0
+            return super(MaxLogLevel, self).filter(record)
+        return 0

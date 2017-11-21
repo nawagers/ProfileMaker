@@ -101,7 +101,7 @@ class POI:
         if verticaladvance is None:
             verticaladvance = max(self.textfont.font.height,
                                   self.servicesfont.font.height)
-        return len(self.wordwrap(lengths)) * verticaladvance
+        return len(self.wordwrap(lengths), backward) * verticaladvance
 
     def __lt__(self, other):
         """Return True if self.distance is less than other.distance."""
@@ -164,9 +164,9 @@ class POI:
                     if currentline < len(lengths)-1:
                         currentline += 1
                     paragraph = paragraph[curspace+1:].strip(' ')
-            if len(paragraph) > 0:
+            if paragraph:
                 # remaining text is less than max length
                 lines.append(paragraph)
                 if currentline < len(lengths)-1:
-                        currentline += 1
-        return(lines)
+                    currentline += 1
+        return lines
