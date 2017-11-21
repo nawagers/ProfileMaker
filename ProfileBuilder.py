@@ -61,6 +61,7 @@ if not os.path.isfile(WaypointFile):
 TrackNumber = int(Config.get("InputFiles", "TrackNumber"))
 
 # PlotSave
+template = page()
 OutputDir = Config.get("OutputFiles", "OutputDir")
 if not os.path.isabs(OutputDir):
     OutputDir = os.path.join(os.path.dirname(ConfigFileName), OutputDir)
@@ -70,10 +71,13 @@ if not os.path.isdir(OutputDir):
 imageFile = os.path.join(OutputDir, Config.get("OutputFiles", "OutputBase"))
 imageFile = os.path.normpath(imageFile)
 imageExt = ".png"
+template.filename = imageFile + "class"
+
 
 # Display characteristics
 # Areas in pixels
 DPI = Config.getint("PageSize", "DPI")
+template.DPI = DPI
 LeftBuffer = int(Config.getfloat("PlotArea", "LeftBuffer")*DPI)
 RightBuffer = int(Config.getfloat("PlotArea", "RightBuffer")*DPI)
 TopBuffer = int(Config.getfloat("PlotArea", "TopBuffer")*DPI)
@@ -83,6 +87,12 @@ VertPixels = (int(Config.getfloat("PageSize", "Height")*DPI)
               - TopBuffer - BottomBuffer)
 HorPixels = (int(Config.getfloat("PageSize", "Width")*DPI)
              - LeftBuffer - RightBuffer)
+template.plotleft = LeftBuffer
+template.plotbottom = BottomBuffer
+template.pageheight = int(Config.getfloat("PageSize", "Height")*DPI)
+template.pagewidth = int(Config.getfloat("PageSize", "Width")*DPI)
+template.plotheight = VertPixels
+template.plotwidth = HorPixels
 
 # Page Number Box
 PageNumberBoxHeight = int(Config.getfloat("PageNumber", "Height")*DPI)
@@ -250,7 +260,7 @@ for point in gpsdoc.tracks[TrackNumber].segments[0].points:
                                     services=Waypoints[waypoint+skipper][3]))
                 else:
                     log.warning("Empty Waypoint:")
-                    log.warning(Waypoint[waypoint+skipper])
+                    log.warning(Waypoints[waypoint+skipper])
                 del Waypoints[waypoint+skipper]
                 skipper -= 1
         
